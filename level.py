@@ -1,6 +1,6 @@
 import pygame
-from configurations import tile_size,\
-import_folder, time_format, fonts, health_img, lives, characters
+from configurations import tile_size,import_folder, time_format,\
+fonts, health_img, lives, names_initial, characters
 from tiles import Tile
 from characters import CharacterX, CharacterBill
 from bullets import Bullet
@@ -13,6 +13,7 @@ from climb_limits import ClimbLimit
 from player import Player
 from door import Door
 from goal import Goal
+from key import Key
 
 class Level:
     def __init__(self, surface, level_data, level:str):
@@ -31,7 +32,8 @@ class Level:
         
         # Status bar
         self.health_img = health_img
-        self.lives_img = lives
+        self.names_initial_dict = names_initial
+        self.lives_dict = lives
 
         # Music
         song = pygame.mixer.Sound(level_data['song'])
@@ -62,6 +64,7 @@ class Level:
         self.live = pygame.sprite.GroupSingle()
         self.character = pygame.sprite.GroupSingle()
         self.door = pygame.sprite.GroupSingle()
+        self.key = pygame.sprite.GroupSingle()
         self.enemy_limits = []
         self.climb_limits = []
         
@@ -103,6 +106,9 @@ class Level:
                         case 'D':
                             door = Door((x,y))
                             self.door.add(door)
+                        case 'K':
+                            key = Key((x,y))
+                            self.key.add(key)
                         case 'P':
                             player = CharacterX((x,y), self.player_stats.facing_right)
                             self.character.add(player)
@@ -169,8 +175,9 @@ class Level:
             screen.blit(fonts[char], (x, 20))
             x += 32
         screen.blit(self.health_img, (1080, 10))
+        screen.blit(self.names_initial_dict[self.character_name], (1188,18))
         for live in range(self.player_stats.health):
-            screen.blit(self.lives_img[str(live+1)]['img'], self.lives_img[str(live+1)]['pos'])
+            screen.blit(self.lives_dict[str(live+1)]['img'], self.lives_dict[str(live+1)]['pos'])
     
     def update_timer(self, current_time):
         if current_time - self.level_delay > 1000:
@@ -235,6 +242,10 @@ class Level:
             if self.character.sprite.dead:
                 self.stop = True
             self.character.draw(self.display_surface)
+
+            # Key
+            self.key.draw(self.display_surface)
+            self.key.update(self.character, self.player_stats)
 
             # Door
             self.door.draw(self.display_surface)

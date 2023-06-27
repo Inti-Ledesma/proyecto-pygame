@@ -9,7 +9,7 @@ level_1_dict = {
     '                                        ',
     '                                        ',
     '                                        ',
-    '                c                       ',
+    '  K   P         c                       ',
     '                                        ',
     '33333333333333334                       ',
     '╔77777777777╗╔776  c     c              ',
@@ -25,7 +25,7 @@ level_1_dict = {
     '77776   15          cc                 2',
     'ED     2╝5     cc       24            2╝',
     'E      195       c  00  15  B      B  19',
-    'E  P  2╝95         ^^^^^1╚333333333333╝9',
+    'E     2╝95         ^^^^^1╚333333333333╝9',
     '333333╝99╚33334  2333333╝999999999999999'
     ],'limits':[
     '                                        ',
@@ -105,7 +105,7 @@ for font_index,font in enumerate(fonts):
     fonts[font] = list_of_fonts[font_index]
 
 # Health
-health_img = pygame.image.load("resources/graphics/characters/bill/health/bar.png")
+health_img = pygame.image.load("resources/graphics/characters/health/bar.png")
 width = health_img.get_width() * 3
 height = health_img.get_height() * 3
 health_img = pygame.transform.scale(health_img, (width, height))
@@ -115,12 +115,28 @@ lives = {
     '2':{'img':'', 'pos':(1122, 22)},
     '3':{'img':'', 'pos':(1092, 22)}
 }
-live_img = pygame.image.load("resources/graphics/characters/x/health/live.png")
+live_img = pygame.image.load("resources/graphics/characters/health/live.png")
 width = live_img.get_width() * 3
 height = live_img.get_height() * 3
 live_img = pygame.transform.scale(live_img, (width, height))
 for live in lives.keys():
     lives[live]['img'] = live_img
+
+names_initial = {
+    'x':'',
+    'bill':''
+}
+
+name_initial_img = pygame.image.load("resources/graphics/characters/health/x.png")
+width = name_initial_img.get_width() * 3
+height = name_initial_img.get_height() * 3
+names_initial['x'] = pygame.transform.scale(name_initial_img, (width, height))
+
+name_initial_img = pygame.image.load("resources/graphics/characters/health/b.png")
+width = name_initial_img.get_width() * 3
+height = name_initial_img.get_height() * 3
+names_initial['bill'] = pygame.transform.scale(name_initial_img, (width, height))
+
 
 # Characters
 

@@ -169,11 +169,12 @@ class CharacterX(pygame.sprite.Sprite):
                 self.hitbox.left = 0
             
             # Door collision
-            if self.hitbox.colliderect(door.hitbox):
-                if self.direction.x < 0:
-                    self.hitbox.left = door.hitbox.right
-                elif self.direction.x > 0:
-                    self.hitbox.right = door.hitbox.left
+            if door:
+                if self.hitbox.colliderect(door.hitbox):
+                    if self.direction.x < 0:
+                        self.hitbox.left = door.hitbox.right
+                    elif self.direction.x > 0:
+                        self.hitbox.right = door.hitbox.left
 
         # Vertical collision
         self.apply_gravity()
@@ -414,11 +415,12 @@ class CharacterBill(pygame.sprite.Sprite):
                 self.hitbox.left = 0
             
             # Door collision
-            if self.hitbox.colliderect(door.hitbox):
-                if self.direction.x < 0:
-                    self.hitbox.left = door.hitbox.right
-                elif self.direction.x > 0:
-                    self.hitbox.right = door.hitbox.left
+            if door:
+                if self.hitbox.colliderect(door.hitbox):
+                    if self.direction.x < 0:
+                        self.hitbox.left = door.hitbox.right
+                    elif self.direction.x > 0:
+                        self.hitbox.right = door.hitbox.left
 
         # Climbing limits    
         if self.climb:
