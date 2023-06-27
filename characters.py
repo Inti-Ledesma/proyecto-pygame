@@ -36,7 +36,7 @@ class CharacterX(pygame.sprite.Sprite):
         self.health = 3
         self.score = 0
         self.damage = 2
-        self.fire_rate = 200
+        self.fire_rate = 250
         self.dead = False
 
     def import_character_assets(self):
@@ -83,6 +83,7 @@ class CharacterX(pygame.sprite.Sprite):
             if self.health <= 0:
                 self.status = 'death'
                 self.animation_speed = 0.05
+                self.direction.x = 0
             else:
                 self.status = 'pain'
                 if self.prev_status != 'pain':
@@ -312,6 +313,7 @@ class CharacterBill(pygame.sprite.Sprite):
             if self.health <= 0:
                 self.status = 'death'
                 self.animation_speed = 0.05
+                self.direction.x = 0
             else:
                 self.status = 'pain'
                 if self.prev_status != 'pain':

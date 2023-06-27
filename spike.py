@@ -15,6 +15,7 @@ class Spike(pygame.sprite.Sprite):
                 player.pain = True
                 player.health -= 1
                 player.invulnerability_timer = pygame.time.get_ticks()
+                player.speed = 1
     
     def update(self, player:pygame.sprite.GroupSingle):
         self.check_collissions(player.sprite)

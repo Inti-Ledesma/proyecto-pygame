@@ -23,7 +23,7 @@ class Level:
         self.level_delay = pygame.time.get_ticks()
         self.bullet_delay = pygame.time.get_ticks()
         self.stop = False
-        self.character = 'x'
+        self.character_name = 'x'
         self.character_change_delay = -2000
         self.player_stats = Player()
         
@@ -101,25 +101,25 @@ class Level:
 
     def generate_bullet(self, current_time):
         character = self.character.sprite
-        path = characters[self.character]['bullet_path']
-        size = characters[self.character]['bullet_size']
+        path = characters[self.character_name]['bullet_path']
+        size = characters[self.character_name]['bullet_size']
         shoot_up = False
 
         if character.facing_right:
-            x = character.hitbox.x + characters[self.character]['bullet_spawn_xright']
+            x = character.hitbox.x + characters[self.character_name]['bullet_spawn_xright']
         else:
-            x = character.hitbox.x + characters[self.character]['bullet_spawn_xleft']
+            x = character.hitbox.x + characters[self.character_name]['bullet_spawn_xleft']
         
-        if self.character == 'bill':
+        if self.character_name == 'bill':
             if character.crouch:
-                y = character.hitbox.y + characters[self.character]['bullet_spawn_ycrouch']
+                y = character.hitbox.y + characters[self.character_name]['bullet_spawn_ycrouch']
             else:
-                y = character.hitbox.y + characters[self.character]['bullet_spawn_y']
+                y = character.hitbox.y + characters[self.character_name]['bullet_spawn_y']
             
             if character.look_up:
                 shoot_up = True
         else:
-            y = character.hitbox.y + characters[self.character]['bullet_spawn_y']
+            y = character.hitbox.y + characters[self.character_name]['bullet_spawn_y']
 
         if current_time - self.bullet_delay > character.fire_rate and\
         character.shooting and len(self.bullets) < 6:
@@ -154,7 +154,7 @@ class Level:
             screen.blit(fonts[char], (x, 20))
             x += 32
         screen.blit(self.health_img, (1080, 10))
-        for live in range(character.health):
+        for live in range(self.player_stats.health):
             screen.blit(self.lives_img[str(live+1)]['img'], self.lives_img[str(live+1)]['pos'])
     
     def update_timer(self, current_time):
@@ -167,12 +167,12 @@ class Level:
 
         if keys[pygame.K_SPACE] and not self.character.sprite.pain and\
         current_time - self.character_change_delay > 2000:
-            if self.character == 'x':
+            if self.character_name == 'x':
                 self.character.add(CharacterBill(self.character.sprite.hitbox.center))
-                self.character = 'bill'
+                self.character_name = 'bill'
             else:
                 self.character.add(CharacterX(self.character.sprite.hitbox.center))
-                self.character = 'x'
+                self.character_name = 'x'
             self.character_change_delay = pygame.time.get_ticks()
 
     def run(self, current_time, editor_mode):
@@ -203,8 +203,9 @@ class Level:
             # Live (regeneration)
             self.live.draw(self.display_surface)
             self.live.update(self.character)
+
             # Player
-            if self.character == 'x':
+            if self.character_name == 'x':
                 self.character.update(current_time, self.tiles, self.display_surface)
             else:
                 self.character.update(current_time, self.tiles, self.display_surface, self.climb_limits)
