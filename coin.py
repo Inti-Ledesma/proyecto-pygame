@@ -17,11 +17,11 @@ class Coin(pygame.sprite.Sprite):
         
         self.image = self.animations[int(self.frame_index)]
     
-    def collisions(self, player):
+    def collisions(self, player, player_stats):
         if self.rect.colliderect(player.hitbox):
-            player.score += 100
+            player_stats.score += 100
             self.kill()
     
-    def update(self, player:pygame.sprite.GroupSingle):
-        self.collisions(player.sprite)
+    def update(self, player:pygame.sprite.GroupSingle, player_stats):
+        self.collisions(player.sprite, player_stats)
         self.animate()

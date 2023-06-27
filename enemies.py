@@ -77,7 +77,7 @@ class BallDeVoux(pygame.sprite.Sprite):
         else:
             self.status = 'turn'
     
-    def check_collisions(self, limits:list, bullets:pygame.sprite.Group, player):
+    def check_collisions(self, limits:list, bullets:pygame.sprite.Group, player, player_stats):
         # Horizontal collision
         if self.direction != 0:
             self.hitbox.x += self.speed * self.direction
@@ -101,20 +101,20 @@ class BallDeVoux(pygame.sprite.Sprite):
                     self.health -= player.damage
                     if self.health <= 0:
                         self.dead = True
-                        player.score += self.score_value
+                        player_stats.score += self.score_value
                     bullet.kill()
 
         # Player collision
         if not player.invulnerable:
             if self.hitbox.colliderect(player.hitbox):
                 player.pain = True
-                player.health -= 1
+                player_stats.health -= 1
                 player.invulnerability_timer = pygame.time.get_ticks()
                 player.speed = 1
 
-    def update(self, limits, bullets, player:pygame.sprite.GroupSingle, tiles, screen, current_time):
+    def update(self, limits, bullets, player:pygame.sprite.GroupSingle, tiles, screen, current_time, player_stats):
         if not self.dead:
-            self.check_collisions(limits, bullets, player.sprite)
+            self.check_collisions(limits, bullets, player.sprite, player_stats)
             self.get_status()
         self.animate()
 
@@ -194,7 +194,7 @@ class Spiky(pygame.sprite.Sprite):
             self.direction.y += self.gravity
         self.hitbox.y += self.direction.y
 
-    def check_collisions(self, tiles:pygame.sprite.Group, bullets, player, screen):
+    def check_collisions(self, tiles:pygame.sprite.Group, bullets, player, screen, player_stats):
         # Horizontal collision
         if self.direction.x != 0:
             self.hitbox.x += self.direction.x * self.speed
@@ -240,20 +240,20 @@ class Spiky(pygame.sprite.Sprite):
                     self.health -= player.damage
                     if self.health <= 0:
                         self.dead = True
-                        player.score += self.score_value
+                        player_stats.score += self.score_value
                     bullet.kill()
 
         # Player collision
         if not player.invulnerable:
             if self.hitbox.colliderect(player.hitbox):
                 player.pain = True
-                player.health -= 1
+                player_stats.health -= 1
                 player.invulnerability_timer = pygame.time.get_ticks()
                 player.speed = 1
     
-    def update(self, limits, bullets, player, tiles:pygame.sprite.Group, screen, current_time):
+    def update(self, limits, bullets, player, tiles:pygame.sprite.Group, screen, current_time, player_stats):
         if not self.dead:
-            self.check_collisions(tiles, bullets, player.sprite, screen)
+            self.check_collisions(tiles, bullets, player.sprite, screen, player_stats)
             self.get_status()
         self.animate()
 
@@ -335,7 +335,7 @@ class GunVolt(pygame.sprite.Sprite):
         self.bullets.add(GunVoltBullet((x,y)))
         self.bullets.add(GunVoltBullet((x+38,y)))
     
-    def check_collisions(self, bullets:pygame.sprite.Group, player):
+    def check_collisions(self, bullets:pygame.sprite.Group, player, player_stats):
         # Bullets collision
         if len(bullets):
             for bullet in bullets.sprites():
@@ -344,20 +344,20 @@ class GunVolt(pygame.sprite.Sprite):
                     self.health -= player.damage
                     if self.health <= 0:
                         self.dead = True
-                        player.score += self.score_value
+                        player_stats.score += self.score_value
                     bullet.kill()
 
         # Player collision
         if not player.invulnerable:
             if self.hitbox.colliderect(player.hitbox):
                 player.pain = True
-                player.health -= 1
+                player_stats.health -= 1
                 player.invulnerability_timer = pygame.time.get_ticks()
                 player.speed = 1
 
-    def update(self, limits, bullets, player:pygame.sprite.GroupSingle, tiles, screen, current_time):
+    def update(self, limits, bullets, player:pygame.sprite.GroupSingle, tiles, screen, current_time, player_stats):
         if not self.dead:
-            self.check_collisions(bullets, player.sprite)
+            self.check_collisions(bullets, player.sprite, player_stats)
             self.get_status(player.sprite, current_time)
         self.animate()
         self.bullets.update(tiles, screen, player)

@@ -184,16 +184,17 @@ class Level:
             self.tiles.draw(self.display_surface)
 
             # Spikes
+            self.spikes.update(self.character, self.player_stats)
             self.spikes.draw(self.display_surface)
-            self.spikes.update(self.character)
-
+            
             # Coins
-            self.coins.update(self.character)
+            self.coins.update(self.character, self.player_stats)
             self.coins.draw(self.display_surface)
 
             # Enemies
             self.enemies.draw(self.display_surface)
-            self.enemies.update(self.enemy_limits, self.bullets, self.character, self.tiles, self.display_surface, current_time)
+            self.enemies.update(self.enemy_limits, self.bullets, self.character,
+                 self.tiles, self.display_surface, current_time, self.player_stats)
 
             # Bullets
             self.generate_bullet(current_time)
@@ -202,16 +203,17 @@ class Level:
 
             # Live (regeneration)
             self.live.draw(self.display_surface)
-            self.live.update(self.character)
+            self.live.update(self.character, self.player_stats)
 
             # Player
             if self.character_name == 'x':
-                self.character.update(current_time, self.tiles, self.display_surface)
+                self.character.update(current_time, self.tiles, self.display_surface, self.player_stats)
             else:
-                self.character.update(current_time, self.tiles, self.display_surface, self.climb_limits)
+                self.character.update(current_time, self.tiles, self.display_surface, self.climb_limits, self.player_stats)
             if self.character.sprite.dead:
                 self.stop = True
             self.character.draw(self.display_surface)
+
             # Status Bar
             self.status_bar(self.display_surface)
             self.update_timer(current_time)

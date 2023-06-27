@@ -33,8 +33,6 @@ class CharacterX(pygame.sprite.Sprite):
         self.invulnerability_timer = 0
         self.invulnerable = False
         self.dash = False
-        self.health = 3
-        self.score = 0
         self.damage = 2
         self.fire_rate = 250
         self.dead = False
@@ -73,21 +71,21 @@ class CharacterX(pygame.sprite.Sprite):
             else:
                 self.shooting = False
 
-    def get_status(self, current_time):
+    def get_status(self, current_time, player_stats):
         if self.shooting:
             prefix = 's_'
         else:
             prefix = 'd_'
             
         if self.pain:
-            if self.health <= 0:
+            if player_stats.health <= 0:
                 self.status = 'death'
                 self.animation_speed = 0.05
                 self.direction.x = 0
             else:
                 self.status = 'pain'
                 if self.prev_status != 'pain':
-                    self.score -= 500
+                    player_stats.score -= 500
                 if self.facing_right:
                     self.direction.x = -1
                 else:
@@ -112,14 +110,14 @@ class CharacterX(pygame.sprite.Sprite):
             self.frame_index = 0
             self.prev_status = self.status
 
-    def animate(self):
+    def animate(self, player_stats):
         animation = self.animations[self.status]
 
         self.frame_index += self.animation_speed
         if self.frame_index >= len(animation):
             self.frame_index = 0
             if self.pain:
-                if self.health <= 0:
+                if player_stats.health <= 0:
                     self.dead = True
                     self.frame_index = -1
                 else:
@@ -140,7 +138,7 @@ class CharacterX(pygame.sprite.Sprite):
             self.direction.y += self.gravity
         self.hitbox.y += self.direction.y
 
-    def check_collisions(self, tiles:pygame.sprite.Group, screen):
+    def check_collisions(self, tiles:pygame.sprite.Group, screen, player_stats):
         # Adjustments
         if self.status == 'pain':
             if self.facing_right:
@@ -188,7 +186,7 @@ class CharacterX(pygame.sprite.Sprite):
         # Screen limits collision
         screen_height = screen.get_height()
         if self.rect.top > screen_height:
-            self.health = 0
+            player_stats.health = 0
             self.dead = True
         elif self.hitbox.top < 64:
             self.hitbox.top = 64
@@ -200,11 +198,11 @@ class CharacterX(pygame.sprite.Sprite):
         if self.on_ceiling and self.direction.y > 0:
             self.on_ceiling = False
     
-    def update(self, current_time, tiles, screen):
+    def update(self, current_time, tiles, screen, player_stats):
         self.get_input()
-        self.get_status(current_time)
-        self.animate()
-        self.check_collisions(tiles, screen)
+        self.get_status(current_time, player_stats)
+        self.animate(player_stats)
+        self.check_collisions(tiles, screen, player_stats)
 
 class CharacterBill(pygame.sprite.Sprite):
     def __init__(self, pos):
@@ -237,8 +235,6 @@ class CharacterBill(pygame.sprite.Sprite):
         self.pain = False
         self.invulnerability_timer = 0
         self.invulnerable = False
-        self.health = 3
-        self.score = 0
         self.damage = 0.5
         self.crouch = False
         self.look_up = False
@@ -303,21 +299,21 @@ class CharacterBill(pygame.sprite.Sprite):
             else:
                 self.shooting = False
 
-    def get_status(self, current_time):
+    def get_status(self, current_time, player_stats):
         if self.shooting:
             prefix = 's_'
         else:
             prefix = 'd_'
             
         if self.pain:
-            if self.health <= 0:
+            if player_stats.health <= 0:
                 self.status = 'death'
                 self.animation_speed = 0.05
                 self.direction.x = 0
             else:
                 self.status = 'pain'
                 if self.prev_status != 'pain':
-                    self.score -= 500
+                    player_stats.score -= 500
                 if self.facing_right:
                     self.direction.x = -1
                 else:
@@ -353,14 +349,14 @@ class CharacterBill(pygame.sprite.Sprite):
             self.prev_status = self.status
             self.frame_index = 0
 
-    def animate(self):
+    def animate(self, player_stats):
         animation = self.animations[self.status]
 
         self.frame_index += self.animation_speed
         if self.frame_index >= len(animation):
             self.frame_index = 0
             if self.pain:
-                if self.health <= 0:
+                if player_stats.health <= 0:
                     self.dead = True
                     self.frame_index = -1
                 else:
@@ -381,7 +377,7 @@ class CharacterBill(pygame.sprite.Sprite):
             self.direction.y += self.gravity
         self.hitbox.y += self.direction.y
 
-    def check_collisions(self, tiles:pygame.sprite.Group, screen, climb_limits):
+    def check_collisions(self, tiles:pygame.sprite.Group, screen, climb_limits, player_stats):
         # Horizontal collision
         if self.direction.x != 0:
             self.hitbox.x += self.direction.x * self.speed
@@ -437,7 +433,7 @@ class CharacterBill(pygame.sprite.Sprite):
         # Screen limits collision
         screen_height = screen.get_height()
         if self.rect.top > screen_height:
-            self.health = 0
+            player_stats.health = 0
             self.dead = True
         elif self.hitbox.top < 64:
             self.hitbox.top = 64
@@ -449,8 +445,8 @@ class CharacterBill(pygame.sprite.Sprite):
         if self.on_ceiling and self.direction.y > 0:
             self.on_ceiling = False
 
-    def update(self, current_time, tiles, screen, climb_limits):
+    def update(self, current_time, tiles, screen, climb_limits, player_stats):
         self.get_input()
-        self.get_status(current_time)
-        self.animate()
-        self.check_collisions(tiles, screen, climb_limits)
+        self.get_status(current_time, player_stats)
+        self.animate(player_stats)
+        self.check_collisions(tiles, screen, climb_limits, player_stats)

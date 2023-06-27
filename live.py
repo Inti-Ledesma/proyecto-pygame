@@ -18,13 +18,13 @@ class Live(pygame.sprite.Sprite):
         image = self.animations[int(self.frame_index)]
         self.image = image
     
-    def check_collissions(self, player):
+    def check_collissions(self, player, player_stats):
         # Player collision
         if self.rect.colliderect(player.hitbox):
-            if player.health < 3:
-                player.health += 1
+            if player_stats.health < 3:
+                player_stats.health += 1
                 self.kill()
     
-    def update(self, player:pygame.sprite.GroupSingle):
+    def update(self, player:pygame.sprite.GroupSingle, player_stats):
         self.animation()
-        self.check_collissions(player.sprite)
+        self.check_collissions(player.sprite, player_stats)
