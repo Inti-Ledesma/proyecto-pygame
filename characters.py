@@ -2,7 +2,7 @@ import pygame
 from configurations import import_folder
 
 class CharacterX(pygame.sprite.Sprite):
-    def __init__(self, pos:tuple):
+    def __init__(self, pos:tuple, facing_right):
         super().__init__()
 
         # Animation
@@ -25,7 +25,7 @@ class CharacterX(pygame.sprite.Sprite):
         # Status
         self.status = 'd_idle'
         self.prev_status = ''
-        self.facing_right = True
+        self.facing_right = facing_right
         self.on_ground = False
         self.on_ceiling = False
         self.shooting = False
@@ -138,7 +138,7 @@ class CharacterX(pygame.sprite.Sprite):
             self.direction.y += self.gravity
         self.hitbox.y += self.direction.y
 
-    def check_collisions(self, tiles:pygame.sprite.Group, screen, player_stats):
+    def check_collisions(self, tiles:pygame.sprite.Group, door, screen, player_stats):
         # Adjustments
         if self.status == 'pain':
             if self.facing_right:
@@ -167,6 +167,13 @@ class CharacterX(pygame.sprite.Sprite):
                 self.hitbox.right = screen_width
             elif self.hitbox.left < 0:
                 self.hitbox.left = 0
+            
+            # Door collision
+            if self.hitbox.colliderect(door.hitbox):
+                if self.direction.x < 0:
+                    self.hitbox.left = door.hitbox.right
+                elif self.direction.x > 0:
+                    self.hitbox.right = door.hitbox.left
 
         # Vertical collision
         self.apply_gravity()
@@ -198,14 +205,14 @@ class CharacterX(pygame.sprite.Sprite):
         if self.on_ceiling and self.direction.y > 0:
             self.on_ceiling = False
     
-    def update(self, current_time, tiles, screen, player_stats):
+    def update(self, current_time, tiles, door, screen, player_stats):
         self.get_input()
         self.get_status(current_time, player_stats)
         self.animate(player_stats)
-        self.check_collisions(tiles, screen, player_stats)
+        self.check_collisions(tiles, door.sprite, screen, player_stats)
 
 class CharacterBill(pygame.sprite.Sprite):
-    def __init__(self, pos):
+    def __init__(self, pos, facing_right):
         super().__init__()
 
         # Animation
@@ -228,7 +235,7 @@ class CharacterBill(pygame.sprite.Sprite):
         # Status
         self.status = 'd_idle'
         self.prev_status = ''
-        self.facing_right = True
+        self.facing_right = facing_right
         self.on_ground = False
         self.on_ceiling = False
         self.shooting = False
@@ -377,7 +384,7 @@ class CharacterBill(pygame.sprite.Sprite):
             self.direction.y += self.gravity
         self.hitbox.y += self.direction.y
 
-    def check_collisions(self, tiles:pygame.sprite.Group, screen, climb_limits, player_stats):
+    def check_collisions(self, tiles:pygame.sprite.Group, door, screen, climb_limits, player_stats):
         # Horizontal collision
         if self.direction.x != 0:
             self.hitbox.x += self.direction.x * self.speed
@@ -405,6 +412,13 @@ class CharacterBill(pygame.sprite.Sprite):
                 self.hitbox.right = screen_width
             elif self.hitbox.left < 0:
                 self.hitbox.left = 0
+            
+            # Door collision
+            if self.hitbox.colliderect(door.hitbox):
+                if self.direction.x < 0:
+                    self.hitbox.left = door.hitbox.right
+                elif self.direction.x > 0:
+                    self.hitbox.right = door.hitbox.left
 
         # Climbing limits    
         if self.climb:
@@ -445,8 +459,8 @@ class CharacterBill(pygame.sprite.Sprite):
         if self.on_ceiling and self.direction.y > 0:
             self.on_ceiling = False
 
-    def update(self, current_time, tiles, screen, climb_limits, player_stats):
+    def update(self, current_time, tiles, door, screen, climb_limits, player_stats):
         self.get_input()
         self.get_status(current_time, player_stats)
         self.animate(player_stats)
-        self.check_collisions(tiles, screen, climb_limits, player_stats)
+        self.check_collisions(tiles, door.sprite, screen, climb_limits, player_stats)

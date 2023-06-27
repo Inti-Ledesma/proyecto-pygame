@@ -7,7 +7,7 @@ class BallDeVoux(pygame.sprite.Sprite):
         super().__init__()
 
         # Animation
-        self.import_assets("balldevoux")
+        self.import_assets()
         self.frame_index = 0
         self.animation_speed = 0.1
         self.image:pygame.surface.Surface = self.animations['walk'][self.frame_index]
@@ -28,8 +28,8 @@ class BallDeVoux(pygame.sprite.Sprite):
         self.dead = False
         self.score_value = 500
     
-    def import_assets(self, enemy):
-        character_path = "resources/graphics/enemies/" + enemy + "/"
+    def import_assets(self):
+        character_path = "resources/graphics/enemies/balldevoux/"
         
         self.animations = {'walk':[], 'turn':[], 'explosion':[]}
 
@@ -123,7 +123,7 @@ class Spiky(pygame.sprite.Sprite):
         super().__init__()
 
         # Animation
-        self.import_assets("spiky")
+        self.import_assets()
         self.frame_index = 0
         self.animation_speed = 0.4
         self.image:pygame.surface.Surface = self.animations['spin'][self.frame_index]
@@ -148,8 +148,8 @@ class Spiky(pygame.sprite.Sprite):
         self.dead = False
         self.score_value = 250
     
-    def import_assets(self, enemy):
-        character_path = "resources/graphics/enemies/" + enemy + "/"
+    def import_assets(self):
+        character_path = "resources/graphics/enemies/spiky/"
         
         self.animations = {'spin':[], 'death':[], 'explosion':[]}
 
@@ -262,7 +262,7 @@ class GunVolt(pygame.sprite.Sprite):
         super().__init__()
 
         # Animation
-        self.import_assets("gunvolt")
+        self.import_assets()
         self.frame_index = 0
         self.animation_speed = 0.2
         self.image:pygame.surface.Surface = self.animations['idle'][self.frame_index]
@@ -283,8 +283,8 @@ class GunVolt(pygame.sprite.Sprite):
         # Bullet
         self.bullets = pygame.sprite.Group()
     
-    def import_assets(self, enemy):
-        character_path = "resources/graphics/enemies/" + enemy + "/"
+    def import_assets(self):
+        character_path = "resources/graphics/enemies/gunvolt/"
         
         self.animations = {'idle':[], 'start':[], 'stop':[], 'explosion':[]}
 

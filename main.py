@@ -10,11 +10,8 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 clock = pygame.time.Clock()
 
 level = Level(screen, levels['1'], '1')
-current_time = 0
+current_time = 0 
 font = pygame.font.SysFont("Arial", 20)
-# song = pygame.mixer.Sound("resources/level_1.ogg")
-# song.set_volume(0.1)
-# song.play(-1)
 
 while 1:
     current_time = pygame.time.get_ticks()

@@ -11,6 +11,8 @@ from spike import Spike
 from live import Live
 from climb_limits import ClimbLimit
 from player import Player
+from door import Door
+from goal import Goal
 
 class Level:
     def __init__(self, surface, level_data, level:str):
@@ -18,6 +20,7 @@ class Level:
         self.surface_size = surface.get_size()
         self.level = level
         self.import_tiles(level)
+        self.player_stats = Player()
         self.level_setup(self.surface_size, level_data['level_layout'], level_data['limits'])
         self.level_timer = 120
         self.level_delay = pygame.time.get_ticks()
@@ -25,11 +28,15 @@ class Level:
         self.stop = False
         self.character_name = 'x'
         self.character_change_delay = -2000
-        self.player_stats = Player()
         
         # Status bar
         self.health_img = health_img
         self.lives_img = lives
+
+        # Music
+        song = pygame.mixer.Sound(level_data['song'])
+        song.set_volume(0)
+        song.play(-1)
 
     def import_tiles(self, level):
         full_path = "resources/graphics/tiles/level_" + level
@@ -51,8 +58,10 @@ class Level:
         self.bullets = pygame.sprite.Group()
         self.coins = pygame.sprite.Group()
         self.spikes = pygame.sprite.Group()
+        self.goal = pygame.sprite.Group()
         self.live = pygame.sprite.GroupSingle()
         self.character = pygame.sprite.GroupSingle()
+        self.door = pygame.sprite.GroupSingle()
         self.enemy_limits = []
         self.climb_limits = []
         
@@ -85,11 +94,17 @@ class Level:
                         case 'G':
                             enemy = GunVolt((x,y+36))
                             self.enemies.add(enemy)
+                        case 'E':
+                            goal = Goal((x,y))
+                            self.goal.add(goal)
                         case 'L':
                             live = Live((x,y))
                             self.live.add(live)
+                        case 'D':
+                            door = Door((x,y))
+                            self.door.add(door)
                         case 'P':
-                            player = CharacterX((x,y))
+                            player = CharacterX((x,y), self.player_stats.facing_right)
                             self.character.add(player)
                 match lvl_limits[row_index][col_index]:
                     case '¡':
@@ -167,11 +182,12 @@ class Level:
 
         if keys[pygame.K_SPACE] and not self.character.sprite.pain and\
         current_time - self.character_change_delay > 2000:
+            self.player_stats.facing_right = self.character.sprite.facing_right
             if self.character_name == 'x':
-                self.character.add(CharacterBill(self.character.sprite.hitbox.center))
+                self.character.add(CharacterBill(self.character.sprite.hitbox.center, self.player_stats.facing_right))
                 self.character_name = 'bill'
             else:
-                self.character.add(CharacterX(self.character.sprite.hitbox.center))
+                self.character.add(CharacterX(self.character.sprite.hitbox.center, self.player_stats.facing_right))
                 self.character_name = 'x'
             self.character_change_delay = pygame.time.get_ticks()
 
@@ -205,14 +221,24 @@ class Level:
             self.live.draw(self.display_surface)
             self.live.update(self.character, self.player_stats)
 
+            # Goal
+            self.goal.draw(self.display_surface)
+            self.goal.update(self.character)
+
             # Player
             if self.character_name == 'x':
-                self.character.update(current_time, self.tiles, self.display_surface, self.player_stats)
+                self.character.update(current_time, self.tiles, self.door,
+                                    self.display_surface, self.player_stats)
             else:
-                self.character.update(current_time, self.tiles, self.display_surface, self.climb_limits, self.player_stats)
+                self.character.update(current_time, self.tiles, self.door,
+                 self.display_surface, self.climb_limits, self.player_stats)
             if self.character.sprite.dead:
                 self.stop = True
             self.character.draw(self.display_surface)
+
+            # Door
+            self.door.draw(self.display_surface)
+            self.door.update(self.player_stats)
 
             # Status Bar
             self.status_bar(self.display_surface)
