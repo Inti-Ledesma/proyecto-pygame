@@ -32,7 +32,6 @@ class CharacterX(pygame.sprite.Sprite):
         self.pain = False
         self.invulnerability_timer = 0
         self.invulnerable = False
-        self.dash = False
         self.damage = 2
         self.fire_rate = 250
         self.dead = False
@@ -77,34 +76,31 @@ class CharacterX(pygame.sprite.Sprite):
             prefix = 's_'
         else:
             prefix = 'd_'
-            
-        if self.pain:
-            if player_stats.health <= 0:
-                self.status = 'death'
-                self.animation_speed = 0.05
-                self.direction.x = 0
+        
+        if player_stats.health <= 0:
+            self.status = 'death'
+            self.animation_speed = 0.05
+            self.direction.x = 0
+        elif self.pain:
+            self.status = 'pain'
+            if self.prev_status != 'pain':
+                player_stats.hits +=1
+            if self.facing_right:
+                self.direction.x = -1
             else:
-                self.status = 'pain'
-                if self.prev_status != 'pain':
-                    player_stats.score -= 500
-                if self.facing_right:
-                    self.direction.x = -1
-                else:
-                    self.direction.x = 1
+                self.direction.x = 1
             self.invulnerable = True
         elif self.direction.y < 0:
             self.status = prefix + 'jump'
         elif self.direction.y > 0:
             self.status = prefix + 'fall'
         else:
-            if self.dash:
-                self.status = prefix + 'dash'
-            elif self.direction.x != 0:
+            if self.direction.x != 0:
                 self.status = prefix + 'walk'
             else:
                 self.status = prefix + 'idle'
         
-        if current_time - self.invulnerability_timer > 1100:
+        if current_time - self.invulnerability_timer > 1500:
             self.invulnerable = False
         
         if player_stats.end_level:
@@ -121,13 +117,12 @@ class CharacterX(pygame.sprite.Sprite):
         self.frame_index += self.animation_speed
         if self.frame_index >= len(animation):
             self.frame_index = 0
-            if self.pain:
-                if player_stats.health <= 0:
-                    self.dead = True
-                    self.frame_index = -1
-                else:
-                    self.pain = False
-                    self.speed = 5
+            if player_stats.health <= 0:
+                self.dead = True
+                self.frame_index = -1
+            elif self.pain:
+                self.pain = False
+                self.speed = 5
 
         image = animation[int(self.frame_index)]
         
@@ -317,20 +312,19 @@ class CharacterBill(pygame.sprite.Sprite):
             prefix = 's_'
         else:
             prefix = 'd_'
-            
-        if self.pain:
-            if player_stats.health <= 0:
-                self.status = 'death'
-                self.animation_speed = 0.05
-                self.direction.x = 0
+        
+        if player_stats.health <= 0:
+            self.status = 'death'
+            self.animation_speed = 0.05
+            self.direction.x = 0
+        elif self.pain:
+            self.status = 'pain'
+            if self.prev_status != 'pain':
+                player_stats.hits += 1
+            if self.facing_right:
+                self.direction.x = -1
             else:
-                self.status = 'pain'
-                if self.prev_status != 'pain':
-                    player_stats.score -= 500
-                if self.facing_right:
-                    self.direction.x = -1
-                else:
-                    self.direction.x = 1
+                self.direction.x = 1
             self.invulnerable = True
         elif self.climb:
             self.status = 'climb_idle'  
@@ -349,7 +343,7 @@ class CharacterBill(pygame.sprite.Sprite):
             else:
                 self.status = prefix + 'idle'
         
-        if current_time - self.invulnerability_timer > 1100:
+        if current_time - self.invulnerability_timer > 1200:
             self.invulnerable = False
         
         # Adjustments
@@ -372,13 +366,12 @@ class CharacterBill(pygame.sprite.Sprite):
         self.frame_index += self.animation_speed
         if self.frame_index >= len(animation):
             self.frame_index = 0
-            if self.pain:
-                if player_stats.health <= 0:
-                    self.dead = True
-                    self.frame_index = -1
-                else:
-                    self.pain = False
-                    self.speed = 5
+            if player_stats.health <= 0:
+                self.dead = True
+                self.frame_index = -1
+            elif self.pain:
+                self.pain = False
+                self.speed = 5
 
         image = animation[int(self.frame_index)]
         

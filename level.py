@@ -20,15 +20,16 @@ class Level:
         self.display_surface = surface
         self.surface_size = surface.get_size()
         self.level = level
-        self.import_tiles(level)
+        self.import_tiles(self.level)
         self.player_stats = Player()
-        self.level_setup(self.surface_size, level_data['level_layout'], level_data['limits'])
-        self.level_timer = 120
+        self.best_score = level_data['best_time_score']
+        self.level_timer = level_data['time']
         self.level_delay = 1000
         self.bullet_delay = 0
-        self.stop = False
         self.character_name = 'x'
         self.character_change_delay = -2000
+        self.stop = False
+        self.level_setup(self.surface_size, level_data['level_layout'], level_data['limits'])
         
         # Status bar
         self.health_img = health_img
@@ -37,7 +38,7 @@ class Level:
 
         # Music
         self.song = pygame.mixer.Sound(level_data['song'])
-        self.song.set_volume(1)
+        self.song.set_volume(0.5)
         self.song.play(-1)
 
     def import_tiles(self, level):
@@ -87,15 +88,19 @@ class Level:
                             self.spikes.add(spike)
                         case 'c':
                             coin = Coin((x+16,y+16))
+                            self.best_score += coin.score_value
                             self.coins.add(coin)
                         case 'B':
                             enemy = BallDeVoux((x,y+36))
+                            self.best_score += enemy.score_value
                             self.enemies.add(enemy)
                         case 'S':
                             enemy = Spiky((x,y+36))
+                            self.best_score += enemy.score_value
                             self.enemies.add(enemy)
                         case 'G':
                             enemy = GunVolt((x,y+36))
+                            self.best_score += enemy.score_value
                             self.enemies.add(enemy)
                         case 'E':
                             goal = Goal((x,y))
@@ -185,14 +190,23 @@ class Level:
     def change_character(self, current_time):
         keys = pygame.key.get_pressed()
 
-        if keys[pygame.K_SPACE] and not self.character.sprite.pain and\
-        current_time - self.character_change_delay > 2000:
+        character = self.character.sprite
+
+        if keys[pygame.K_SPACE] and not (character.pain or character.dead)\
+        and current_time - self.character_change_delay > 2000:
             self.player_stats.facing_right = self.character.sprite.facing_right
             if self.character_name == 'x':
-                self.character.add(CharacterBill(self.character.sprite.hitbox.center, self.player_stats.facing_right))
+                x = self.character.sprite.hitbox.centerx
+                y = self.character.sprite.hitbox.centery - 30
+                self.character.add(CharacterBill((x,y), self.player_stats.facing_right))
                 self.character_name = 'bill'
             else:
-                self.character.add(CharacterX(self.character.sprite.hitbox.center, self.player_stats.facing_right))
+                if self.player_stats.facing_right:
+                    x = self.character.sprite.hitbox.centerx - 12
+                else:
+                    x = self.character.sprite.hitbox.centerx + 4
+                y = self.character.sprite.hitbox.centery - 9
+                self.character.add(CharacterX((x,y), self.player_stats.facing_right))
                 self.character_name = 'x'
             self.character_change_delay = pygame.time.get_ticks()
 
@@ -230,6 +244,14 @@ class Level:
             self.goal.draw(self.display_surface)
             self.goal.update(self.character, self.player_stats)
 
+            # Key
+            self.key.draw(self.display_surface)
+            self.key.update(self.character, self.player_stats)
+
+            # Door
+            self.door.draw(self.display_surface)
+            self.door.update(self.player_stats)
+
             # Player
             if self.character_name == 'x':
                 self.character.update(current_time, self.tiles, self.door,
@@ -245,18 +267,13 @@ class Level:
 
             self.character.draw(self.display_surface)
 
-            # Key
-            self.key.draw(self.display_surface)
-            self.key.update(self.character, self.player_stats)
-
-            # Door
-            self.door.draw(self.display_surface)
-            self.door.update(self.player_stats)
-
             # Status Bar
             self.update_timer(current_time)
-
             self.change_character(current_time)
+
+            # Timer death
+            if self.level_timer == 0:
+                self.player_stats.health = 0
 
             if editor_mode:
                 pygame.draw.rect(self.display_surface, "green", self.character.sprite.rect, 2)
@@ -277,5 +294,26 @@ class Level:
         if self.player_stats.end_level and self.level_timer > 0:
             self.level_timer -= 0.5
             self.player_stats.score += 25
+        
+        if self.level_timer == 0:
+            if self.player_stats.score >= self.best_score and\
+                self.player_stats.hits == 0:
+                print(f'{self.best_score} and {self.player_stats.hits} hits: S+')
+            elif self.player_stats.score >= int(self.best_score*0.9) and\
+                self.player_stats.hits <= 1:
+                print(f'{self.best_score*0.9} and {self.player_stats.hits} hits: S')
+            elif self.player_stats.score >= int(self.best_score*0.8) and\
+                self.player_stats.hits <= 1:
+                print(f'{self.best_score*0.8} and {self.player_stats.hits} hits: A')
+            elif self.player_stats.score >= int(self.best_score*0.7) and\
+                self.player_stats.hits <= 2:
+                print(f'{self.best_score*0.7} and {self.player_stats.hits} hits: B')
+            elif self.player_stats.score >= int(self.best_score*0.5) and\
+                self.player_stats.hits <= 2:
+                print(f'{self.best_score*0.5} and {self.player_stats.hits} hits: C')
+            elif self.player_stats.score < int(self.best_score*0.5) or\
+                self.player_stats.hits <= 3:
+                print(f'{self.best_score*0.5} or {self.player_stats.hits} hits: D')
+            self.level_timer -= 0.1
         
         return self.stop

@@ -9,6 +9,7 @@ class Coin(pygame.sprite.Sprite):
         self.animation_speed = 0.15
         self.image = self.animations[self.frame_index]
         self.rect = self.image.get_rect(center = pos)
+        self.score_value = 100
     
     def animate(self):
         self.frame_index += self.animation_speed
@@ -19,7 +20,7 @@ class Coin(pygame.sprite.Sprite):
     
     def collisions(self, player, player_stats):
         if self.rect.colliderect(player.hitbox):
-            player_stats.score += 100
+            player_stats.score += self.score_value
             self.kill()
     
     def update(self, player:pygame.sprite.GroupSingle, player_stats):
