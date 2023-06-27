@@ -24,8 +24,8 @@ class Level:
         self.player_stats = Player()
         self.level_setup(self.surface_size, level_data['level_layout'], level_data['limits'])
         self.level_timer = 120
-        self.level_delay = pygame.time.get_ticks()
-        self.bullet_delay = pygame.time.get_ticks()
+        self.level_delay = 1000
+        self.bullet_delay = 0
         self.stop = False
         self.character_name = 'x'
         self.character_change_delay = -2000
@@ -36,9 +36,9 @@ class Level:
         self.lives_dict = lives
 
         # Music
-        song = pygame.mixer.Sound(level_data['song'])
-        song.set_volume(0)
-        song.play(-1)
+        self.song = pygame.mixer.Sound(level_data['song'])
+        self.song.set_volume(1)
+        self.song.play(-1)
 
     def import_tiles(self, level):
         full_path = "resources/graphics/tiles/level_" + level
@@ -110,7 +110,7 @@ class Level:
                             key = Key((x,y))
                             self.key.add(key)
                         case 'P':
-                            player = CharacterX((x,y), self.player_stats.facing_right)
+                            player = CharacterX((x,y-14), self.player_stats.facing_right)
                             self.character.add(player)
                 match lvl_limits[row_index][col_index]:
                     case '¡':
@@ -148,8 +148,6 @@ class Level:
             self.bullet_delay = pygame.time.get_ticks()
 
     def status_bar(self, screen:pygame.Surface):
-        character = self.character.sprite
-
         # Bar
         bar = pygame.Rect(0,0,screen.get_width(),64)
         pygame.draw.rect(screen, "black", bar)
@@ -162,7 +160,7 @@ class Level:
             x += 32
 
         # Timer
-        timer_text = time_format(self.level_timer)
+        timer_text = time_format(int(self.level_timer))
         x = 550
         for char in timer_text:
             screen.blit(fonts[char], (x, 20))
@@ -217,7 +215,7 @@ class Level:
             # Enemies
             self.enemies.draw(self.display_surface)
             self.enemies.update(self.enemy_limits, self.bullets, self.character,
-                 self.tiles, self.display_surface, current_time, self.player_stats)
+                self.tiles, self.display_surface, current_time, self.player_stats)
 
             # Bullets
             self.generate_bullet(current_time)
@@ -230,7 +228,7 @@ class Level:
 
             # Goal
             self.goal.draw(self.display_surface)
-            self.goal.update(self.character)
+            self.goal.update(self.character, self.player_stats)
 
             # Player
             if self.character_name == 'x':
@@ -239,8 +237,12 @@ class Level:
             else:
                 self.character.update(current_time, self.tiles, self.door,
                  self.display_surface, self.climb_limits, self.player_stats)
-            if self.character.sprite.dead:
+            
+            # If player dies or ends the level
+            if self.character.sprite.dead or self.player_stats.end_level:
                 self.stop = True
+                self.song.fadeout(10000)
+
             self.character.draw(self.display_surface)
 
             # Key
@@ -252,12 +254,10 @@ class Level:
             self.door.update(self.player_stats)
 
             # Status Bar
-            self.status_bar(self.display_surface)
             self.update_timer(current_time)
 
             self.change_character(current_time)
 
-        if not self.stop:
             if editor_mode:
                 pygame.draw.rect(self.display_surface, "green", self.character.sprite.rect, 2)
                 pygame.draw.rect(self.display_surface, "red", self.character.sprite.hitbox, 2)
@@ -273,4 +273,9 @@ class Level:
                 for coin in self.coins:
                     pygame.draw.rect(self.display_surface, "yellow", coin.rect, 2)
     
+        self.status_bar(self.display_surface)
+        if self.player_stats.end_level and self.level_timer > 0:
+            self.level_timer -= 0.5
+            self.player_stats.score += 25
+        
         return self.stop

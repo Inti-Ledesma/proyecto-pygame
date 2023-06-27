@@ -7,3 +7,4 @@ class Player():
         self.health = 3
         self.facing_right = True
         self.key_grabbed = False
+        self.end_level = False

@@ -43,7 +43,7 @@ class CharacterX(pygame.sprite.Sprite):
         
         self.animations = {'d_idle':[], 'd_walk':[], 'd_jump':[], 'd_fall':[],
                            's_idle':[], 's_walk':[], 's_jump':[], 's_fall':[],
-                           'd_dash':[], 's_dash':[], 'pain':[], 'death':[]}
+                           'pain':[],'death':[],'victory':[]}
 
         for animation in self.animations.keys():
             full_path = character_path + animation
@@ -51,7 +51,7 @@ class CharacterX(pygame.sprite.Sprite):
                                                     (100, 100))
 
     def get_input(self):
-        if not self.pain and not self.dead:
+        if not self.pain and not self.dead and self.status != 'victory':
             keys = pygame.key.get_pressed()
 
             if keys[pygame.K_RIGHT]:
@@ -72,6 +72,7 @@ class CharacterX(pygame.sprite.Sprite):
                 self.shooting = False
 
     def get_status(self, current_time, player_stats):
+        
         if self.shooting:
             prefix = 's_'
         else:
@@ -105,6 +106,10 @@ class CharacterX(pygame.sprite.Sprite):
         
         if current_time - self.invulnerability_timer > 1100:
             self.invulnerable = False
+        
+        if player_stats.end_level:
+            self.status = 'victory'
+            self.direction.x = 0
         
         if self.status != self.prev_status:
             self.frame_index = 0
@@ -271,7 +276,7 @@ class CharacterBill(pygame.sprite.Sprite):
                                                     (122, 128))
 
     def get_input(self):
-        if not self.pain and not self.dead:
+        if not self.pain and not self.dead and self.status != 'victory':
             keys = pygame.key.get_pressed()
             
             # Movement
@@ -352,6 +357,10 @@ class CharacterBill(pygame.sprite.Sprite):
             (self.prev_status == 'crouch' and self.status != 'crouch'):
             self.hitbox.height = 74
             self.hitbox.y -= 34
+        
+        if player_stats.end_level:
+            self.status = 'victory'
+            self.direction.x = 0
         
         if self.status != self.prev_status:
             self.prev_status = self.status
