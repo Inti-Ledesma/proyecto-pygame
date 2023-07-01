@@ -14,7 +14,7 @@ class CharacterX(pygame.sprite.Sprite):
         # Hitbox
         self.rect = self.image.get_rect(center = pos)
         self.hitbox = pygame.Rect(self.rect.x+40, self.rect.y+36, 28, 60)
-        
+
         # Movement
         self.direction = pygame.math.Vector2(0,0)
         self.speed = 5
@@ -160,6 +160,7 @@ class CharacterX(pygame.sprite.Sprite):
                         self.hitbox.left = tile.rect.right
                     elif self.direction.x > 0:
                         self.hitbox.right = tile.rect.left
+                    break
             
             # Screen limits collision
             screen_width = screen.get_width()
@@ -190,6 +191,7 @@ class CharacterX(pygame.sprite.Sprite):
                     self.hitbox.top = tile.rect.bottom
                     self.direction.y = 0.1
                     self.on_ceiling = True
+                break
         
         # Screen limits collision
         screen_height = screen.get_height()
@@ -347,8 +349,7 @@ class CharacterBill(pygame.sprite.Sprite):
             self.invulnerable = False
         
         # Adjustments
-        if (self.prev_status == 'jump' and self.status != 'jump') or\
-            (self.prev_status == 'crouch' and self.status != 'crouch'):
+        if (self.prev_status == 'jump' and self.status != 'jump'):
             self.hitbox.height = 74
             self.hitbox.y -= 34
         

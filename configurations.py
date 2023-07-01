@@ -8,7 +8,7 @@ level_1 = {
     'level_layout':[
     '                                        ',
     '                                        ',
-    '                                        ',
+    '777777777776                            ',
     ' cKc            c                       ',
     '                                        ',
     '33333333333333334                       ',
@@ -25,7 +25,7 @@ level_1 = {
     '77776   15c         cc                 2',
     'ED     2╝5c    cc       24            2╝',
     'E      195c      c  00  15  B      B  19',
-    'E   P 2╝95         ^^^^^1╚333333333333╝9',
+    'E  P  2╝95         ^^^^^1╚333333333333╝9',
     '333333╝99╚33334  2333333╝999999999999999'
     ],'limits':[
     '                                        ',
@@ -49,8 +49,7 @@ level_1 = {
     '         }                              ',
     '          ¡                             ',
     '                                        '
-    ],'song':
-    'resources/music/level_1.ogg',
+    ],'song':'resources/music/level_1.ogg',
     'time':120, 'best_time_score':4500
 }
 
@@ -99,7 +98,8 @@ level_2 = {
     '         }                              ',
     '          ¡                             ',
     '                                        '
-    ],'song':'resources/music/level_2.mp3'
+    ],'song':'resources/music/level_2.ogg',
+    'time':120, 'best_time_score':4500
 }
 
 level_3 = {
@@ -133,27 +133,77 @@ level_3 = {
     '                                        ',
     '                                        ',
     '                                        ',
-    '           ¡                            ',
-    '            }                           ',
-    '          ¡ }                           ',
-    '         }  }                           ',
-    '         }  }                           ',
-    '         }                              ',
-    '         } ¡                            ',
-    '         }                              ',
-    '         }               !            ! ',
-    '         }                              ',
-    '         }                              ',
-    '         }                              ',
-    '          ¡                             ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
     '                                        '
-    ],'song':'resources/music/level_3.ogg'
+    ],'song':'resources/music/level_3.mp3',
+    'time':120, 'best_time_score':4500
+}
+
+boss_level = {
+    'level_layout':[
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                   P                    ',
+    '3333333333333333333333333333333333333333'
+    ],'limits':[
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        '
+    ],'song':'resources/music/boss.ogg'
 }
 
 levels = {
     '1':level_1,
     '2':level_2,
-    '3':level_3
+    '3':level_3,
+    'boss':boss_level
 }
 
 tile_size = 32

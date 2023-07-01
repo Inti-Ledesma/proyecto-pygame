@@ -37,9 +37,9 @@ class Level:
         self.lives_dict = lives
 
         # Music
+        self.music_flag = True
         self.song = pygame.mixer.Sound(level_data['song'])
-        self.song.set_volume(0.5)
-        self.song.play(-1)
+        self.song.set_volume(0.2)
 
     def import_tiles(self, level):
         full_path = "resources/graphics/tiles/level_" + level
@@ -53,7 +53,7 @@ class Level:
             self.tileset[tile] = tiles_list[tile_index]
 
     def level_setup(self, level_size, layout, lvl_limits):
-        self.bg = pygame.image.load("resources/graphics/bg/" + self.level + ".png")
+        self.bg = pygame.image.load("resources/graphics/bg/"+ self.level +".png")
         self.bg = pygame.transform.scale(self.bg, level_size)
 
         self.tiles = pygame.sprite.Group()
@@ -191,26 +191,52 @@ class Level:
         keys = pygame.key.get_pressed()
 
         character = self.character.sprite
+        cont = 0
 
         if keys[pygame.K_SPACE] and not (character.pain or character.dead)\
         and current_time - self.character_change_delay > 2000:
             self.player_stats.facing_right = self.character.sprite.facing_right
+            block = False
             if self.character_name == 'x':
-                x = self.character.sprite.hitbox.centerx
-                y = self.character.sprite.hitbox.centery - 30
-                self.character.add(CharacterBill((x,y), self.player_stats.facing_right))
-                self.character_name = 'bill'
+                for tile in self.tiles.sprites():
+                    new_pos_1 = ((character.hitbox.topleft[0], character.hitbox.topleft[1]-14))
+                    new_pos_2 = ((character.hitbox.topright[0], character.hitbox.topright[1]-14))
+
+                    if tile.rect.x <= new_pos_1[0] < tile.rect.x+32 and\
+                        tile.rect.y <= new_pos_1[1] < tile.rect.y+32 or\
+                        tile.rect.x <= new_pos_2[0] < tile.rect.x+32 and\
+                        tile.rect.y <= new_pos_2[1] < tile.rect.y+32:
+                        block = True
+                        break
+                if not block:
+                    x = self.character.sprite.hitbox.centerx
+                    y = self.character.sprite.hitbox.centery - 30
+                    self.character.add(CharacterBill((x,y), self.player_stats.facing_right))
+                    self.character_name = 'bill'
+                    self.character_change_delay = pygame.time.get_ticks()
             else:
-                if self.player_stats.facing_right:
-                    x = self.character.sprite.hitbox.centerx - 12
-                else:
-                    x = self.character.sprite.hitbox.centerx + 4
-                y = self.character.sprite.hitbox.centery - 9
-                self.character.add(CharacterX((x,y), self.player_stats.facing_right))
-                self.character_name = 'x'
-            self.character_change_delay = pygame.time.get_ticks()
+                for tile in self.tiles.sprites():
+                    new_pos_1 = ((character.hitbox.centerx-12, character.hitbox.centery))
+                    new_pos_2 = ((character.hitbox.centerx+12, character.hitbox.centery))
+
+                    if tile.rect.x <= new_pos_1[0] < tile.rect.x+32 and\
+                        tile.rect.y <= new_pos_1[1] < tile.rect.y+32 or\
+                        tile.rect.x <= new_pos_2[0] < tile.rect.x+32 and\
+                        tile.rect.y <= new_pos_2[1] < tile.rect.y+32:
+                        block = True
+                        break
+                if not block:
+                    x = self.character.sprite.hitbox.centerx
+                    y = self.character.sprite.hitbox.centery - 9
+                    self.character.add(CharacterX((x,y), self.player_stats.facing_right))
+                    self.character_name = 'x'
+                    self.character_change_delay = pygame.time.get_ticks()
 
     def run(self, current_time, editor_mode):
+        if self.music_flag:
+            self.song.play(-1)
+            self.music_flag = False
+        
         if not self.stop:
             # Background
             self.display_surface.blit(self.bg, (0,0))
