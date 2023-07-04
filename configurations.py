@@ -1,18 +1,31 @@
 import pygame
+import json
 from os import walk
+
+# Volumen
+class Volume():
+    def __init__(self):
+        self.music_volume = 0.5
+        self.sfx_volume = 0.5
+
+volume = Volume()
+tile_size = 32
+screen_width = 1280
+screen_height = 672
 
 # Level layout
 #╔  ╗  ╚  ╝
 
 level_1 = {
+    'bg':"resources/graphics/bg/1.png",
     'level_layout':[
     '                                        ',
     '                                        ',
-    '777777777776                            ',
-    ' cKc            c                       ',
-    '                                        ',
-    '33333333333333334                       ',
-    '╔77777777777╗╔776  c     c              ',
+    '777776                                  ',
+    ' cKc           c                        ',
+    '         B                              ',
+    '3333333333333334                        ',
+    '╔77777777777╗╔76   c     c              ',
     '5           15                          ',
     '5   c      c15 L   0     0    c         ',
     '5          c15                          ',
@@ -20,17 +33,17 @@ level_1 = {
     '5   87╗╚34  1999╚33333333333╝╔6    c    ',
     '╚4    87╗5  877777777777777776          ',
     '95  c   15c                      234    ',
-    '9╚4     15c             c        876   c',
-    '99╚34   15c                             ',
+    '9╚4     15c                      876   c',
+    '99╚34   15c             c               ',
     '77776   15c         cc                 2',
-    'ED     2╝5c    cc       24            2╝',
-    'E      195c      c  00  15  B      B  19',
+    'ED     2╝5c   cc        24            2╝',
+    'E      195c     c   00  15   B     B  19',
     'E  P  2╝95         ^^^^^1╚333333333333╝9',
-    '333333╝99╚33334  2333333╝999999999999999'
+    '333333╝99╚3334  23333333╝999999999999999'
     ],'limits':[
     '                                        ',
     '                                        ',
-    '                                        ',
+    '     !          !                       ',
     '                                        ',
     '                                        ',
     '                                        ',
@@ -43,8 +56,8 @@ level_1 = {
     '         }  }                           ',
     '         }                              ',
     '         } ¡                            ',
-    '         }               !            ! ',
     '         }                              ',
+    '         }               !            ! ',
     '         }                              ',
     '         }                              ',
     '          ¡                             ',
@@ -54,6 +67,7 @@ level_1 = {
 }
 
 level_2 = {
+    'bg':"resources/graphics/bg/2.png",
     'level_layout':[
     '                                        ',
     '                                        ',
@@ -103,6 +117,7 @@ level_2 = {
 }
 
 level_3 = {
+    'bg':"resources/graphics/bg/3.png",
     'level_layout':[
     '                                        ',
     '                                        ',
@@ -152,6 +167,7 @@ level_3 = {
 }
 
 boss_level = {
+    'bg':"resources/graphics/bg/boss.png",
     'level_layout':[
     '                                        ',
     '                                        ',
@@ -163,17 +179,17 @@ boss_level = {
     '                                        ',
     '                                        ',
     '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
     '                   P                    ',
-    '3333333333333333333333333333333333333333'
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '                                        ',
+    '3333333333                    3333333333',
+    '          33333333333333333333          ',
+    '                                        '
     ],'limits':[
     '                                        ',
     '                                        ',
@@ -196,7 +212,8 @@ boss_level = {
     '                                        ',
     '                                        ',
     '                                        '
-    ],'song':'resources/music/boss.ogg'
+    ],'song':'resources/music/boss.ogg',
+    'time':120, 'best_time_score':4500
 }
 
 levels = {
@@ -206,22 +223,19 @@ levels = {
     'boss':boss_level
 }
 
-tile_size = 32
-screen_width = 1280
-screen_height = 672
-
+# # Functions
 def import_folder(path:str, size:tuple):
     surfaces_list = []
-
+    
     for _,_,img_files in walk(path):
         for img in img_files:
             full_path = path + '/' + img
             img_surface = pygame.image.load(full_path)
             img_surface = pygame.transform.scale(img_surface,(size))
             surfaces_list.append(img_surface)
-    
+
     return surfaces_list
-# Functions
+
 def time_format(number):
     mins = int(number / 60)
     mins_zeros = ''
@@ -236,7 +250,103 @@ def time_format(number):
     time = f"{mins_zeros}{mins}:{secs_zeros}{secs}"
     return time
 
-# Data collections
+# Levels ranks and scores
+def calculate_rank(best_score, player_score, hits):
+    if player_score >= best_score and hits == 0:
+        rank = 'S+'
+    elif player_score >= int(best_score*0.9) and hits <= 1:
+        rank = 'S'
+    elif player_score >= int(best_score*0.8) and hits <= 1:
+        rank = 'A'
+    elif player_score >= int(best_score*0.65) and hits <= 2:
+        rank = 'B'
+    elif player_score >= int(best_score*0.5) and hits <= 2:
+        rank = 'C'
+    else:
+        rank = 'D'
+    
+    return rank
+
+def calculate_higher_rank(rank_1, rank_2):
+    rtn = ''
+    if rank_2:
+        if rank_1 == 'S' or rank_1 == 'S+':
+            if rank_2 == 'S' or rank_2 == 'S+':
+                if rank_1 > rank_2:
+                    rtn = 1
+                elif rank_1 < rank_2:
+                    rtn = 2
+                else:
+                    rtn = 0
+            else:
+                rtn = 1
+        elif rank_2 == 'S' or rank_2 == 'S+':
+            rtn = 2
+        else:
+            if rank_1 < rank_2:
+                rtn = 1
+            elif rank_1 > rank_2:
+                rtn = 2
+            else:
+                rtn = 0
+    else:
+        rtn = 1
+    
+    return rtn
+
+def create_stats_json():
+    # Json existence check
+    try:
+        with open("player stats.json", "r"):
+            create_json = False
+    except FileNotFoundError:
+        create_json = True
+    
+    if create_json:
+        level = {
+            "score":0,
+            "hits":0,
+            "rank":''
+        }
+        data = {
+            '1':level,
+            '2':level,
+            '3':level,
+            'boss':level
+        }
+        with open("player stats.json", 'w') as file:
+            json.dump(data, file, indent=4)
+
+def level_stats_dict(player):
+    lvl_stats = {
+        'score':player.score,
+        'hits':player.hits,
+        'rank':player.rank
+    }
+    return lvl_stats
+
+def save_level_stats(player, level):
+    with open("player stats.json") as file:
+        data = json.load(file)
+    level_stats = level_stats_dict(player)
+    save_data = False
+    higher_rank = calculate_higher_rank(level_stats['rank'],
+                                        data[level]['rank'])
+    
+    if higher_rank == 1:
+        save_data = True
+    elif higher_rank == 0 and\
+        level_stats['score'] > data[level]['score']:
+        save_data = True
+    
+    if save_data:
+        data[level]['score'] = level_stats['score']
+        data[level]['hits'] = level_stats['hits']
+        data[level]['rank'] = level_stats['rank']
+        with open("player stats.json", 'w') as file:
+            json.dump(data, file, indent=4)
+
+# # Data collections
 
 # Font
 fonts = {
@@ -254,10 +364,10 @@ for font_index,font in enumerate(fonts):
     fonts[font] = list_of_fonts[font_index]
 
 # Health
-health_img = pygame.image.load("resources/graphics/characters/health/bar.png")
-width = health_img.get_width() * 3
-height = health_img.get_height() * 3
-health_img = pygame.transform.scale(health_img, (width, height))
+health_bar_img = pygame.image.load("resources/graphics/characters/health/bar.png")
+width = health_bar_img.get_width() * 3
+height = health_bar_img.get_height() * 3
+health_bar_img = pygame.transform.scale(health_bar_img, (width, height))
 
 lives = {
     '1':{'img':'', 'pos':(1152, 22)},

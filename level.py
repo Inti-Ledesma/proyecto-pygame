@@ -1,27 +1,22 @@
 import pygame
+import random
 from configurations import tile_size,import_folder, time_format,\
-fonts, health_img, lives, names_initial, characters
-from tiles import Tile
-from characters import CharacterX, CharacterBill
+    fonts, health_bar_img, lives, names_initial, characters, volume,\
+    calculate_rank, level_stats_dict, save_level_stats
+from objects import *
+from characters import *
 from bullets import Bullet
-from enemies import BallDeVoux, Spiky, GunVolt
-from enemies_limits import EnemyLimit
-from coin import Coin
-from spike import Spike
-from live import Live
-from climb_limits import ClimbLimit
+from enemies import *
 from player import Player
-from door import Door
-from goal import Goal
-from key import Key
+from limits import *
 
 class Level:
     def __init__(self, surface, level_data, level:str):
         self.display_surface = surface
         self.surface_size = surface.get_size()
         self.level = level
-        self.import_tiles(self.level)
-        self.player_stats = Player()
+        self.import_tiles()
+        self.player = Player()
         self.best_score = level_data['best_time_score']
         self.level_timer = level_data['time']
         self.level_delay = 1000
@@ -30,24 +25,26 @@ class Level:
         self.character_change_delay = -2000
         self.stop = False
         self.level_setup(self.surface_size, level_data['level_layout'], level_data['limits'])
+        self.form_flag = ''
         
         # Status bar
-        self.health_img = health_img
+        self.health_bar_img = health_bar_img
         self.names_initial_dict = names_initial
         self.lives_dict = lives
 
         # Music
         self.music_flag = True
-        self.song = pygame.mixer.Sound(level_data['song'])
-        self.song.set_volume(0.2)
+        pygame.mixer.music.load(level_data['song'])
+        pygame.mixer.music.set_volume(volume.music_volume)
+        pygame.mixer.music.play(-1)
 
-    def import_tiles(self, level):
-        full_path = "resources/graphics/tiles/level_" + level
-        self.tileset = {'0':'','1':'','1}':'','2':'','2}':'','3':'',
+    def import_tiles(self):
+        self.tileset = {'╔':'','╗':'','╚':'','╝':'',
+                        '0':'','1':'','1}':'','2':'','2}':'','3':'',
                         '4':'','4}':'','5':'','5}':'','6':'','6}':'',
-                        '7':'','8':'','8}':'','9':'',
-                        '╔':'','╗':'','╚':'','╝':''}
+                        '7':'','8':'','8}':'','9':'','10':''}
 
+        full_path = "resources/graphics/tiles/level " + self.level
         tiles_list = import_folder(full_path, (32, 32))
         for tile_index, tile in enumerate(self.tileset.keys()):
             self.tileset[tile] = tiles_list[tile_index]
@@ -79,6 +76,8 @@ class Level:
                     if lvl_limits[row_index][col_index] == '}':
                         climbable = True
                         cell += '}'
+                    elif cell == '9':
+                        cell = str(random.randrange(9,11))
                     tile = Tile((x,y), self.tileset[cell], climbable)
                     self.tiles.add(tile)
                 else:
@@ -115,7 +114,7 @@ class Level:
                             key = Key((x,y))
                             self.key.add(key)
                         case 'P':
-                            player = CharacterX((x,y-14), self.player_stats.facing_right)
+                            player = CharacterX((x,y-14), self.player.facing_right)
                             self.character.add(player)
                 match lvl_limits[row_index][col_index]:
                     case '¡':
@@ -159,7 +158,7 @@ class Level:
 
         # Score
         x = 50
-        score_text = "score: " + str(self.player_stats.score)
+        score_text = "score: " + str(self.player.score)
         for char in score_text:
             screen.blit(fonts[char], (x, 20))
             x += 32
@@ -172,16 +171,15 @@ class Level:
             x += 32
         
         # Health
-        health_text = "health:"
         x = 860
-        for char in health_text:
+        for char in "health:":
             screen.blit(fonts[char], (x, 20))
             x += 32
-        screen.blit(self.health_img, (1080, 10))
+        screen.blit(self.health_bar_img, (1080, 10))
         screen.blit(self.names_initial_dict[self.character_name], (1188,18))
-        for live in range(self.player_stats.health):
+        for live in range(self.player.health):
             screen.blit(self.lives_dict[str(live+1)]['img'], self.lives_dict[str(live+1)]['pos'])
-    
+
     def update_timer(self, current_time):
         if current_time - self.level_delay > 1000:
             self.level_timer -= 1
@@ -191,11 +189,10 @@ class Level:
         keys = pygame.key.get_pressed()
 
         character = self.character.sprite
-        cont = 0
 
         if keys[pygame.K_SPACE] and not (character.pain or character.dead)\
-        and current_time - self.character_change_delay > 2000:
-            self.player_stats.facing_right = self.character.sprite.facing_right
+        and current_time - self.character_change_delay > 1500:
+            self.player.facing_right = self.character.sprite.facing_right
             block = False
             if self.character_name == 'x':
                 for tile in self.tiles.sprites():
@@ -211,7 +208,7 @@ class Level:
                 if not block:
                     x = self.character.sprite.hitbox.centerx
                     y = self.character.sprite.hitbox.centery - 30
-                    self.character.add(CharacterBill((x,y), self.player_stats.facing_right))
+                    self.character.add(CharacterBill((x,y), self.player.facing_right))
                     self.character_name = 'bill'
                     self.character_change_delay = pygame.time.get_ticks()
             else:
@@ -228,16 +225,29 @@ class Level:
                 if not block:
                     x = self.character.sprite.hitbox.centerx
                     y = self.character.sprite.hitbox.centery - 9
-                    self.character.add(CharacterX((x,y), self.player_stats.facing_right))
+                    self.character.add(CharacterX((x,y), self.player.facing_right))
                     self.character_name = 'x'
                     self.character_change_delay = pygame.time.get_ticks()
 
-    def run(self, current_time, editor_mode):
+    def run(self, current_time, editor_mode, events_list):
+        if self.form_flag != 'stats screen':
+            self.form_flag = 'level'
+        else:
+            self.form_flag = level_stats_dict(self.player)
+
         if self.music_flag:
-            self.song.play(-1)
+            pygame.mixer.music.set_volume(volume.music_volume)
+            pygame.mixer.music.unpause()
             self.music_flag = False
         
         if not self.stop:
+            for event in events_list:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        pygame.mixer.music.pause()
+                        self.music_flag = True
+                        self.form_flag = 'pause'
+
             # Background
             self.display_surface.blit(self.bg, (0,0))
 
@@ -245,17 +255,17 @@ class Level:
             self.tiles.draw(self.display_surface)
 
             # Spikes
-            self.spikes.update(self.character, self.player_stats)
+            self.spikes.update(self.character, self.player)
             self.spikes.draw(self.display_surface)
             
             # Coins
-            self.coins.update(self.character, self.player_stats)
+            self.coins.update(self.character, self.player)
             self.coins.draw(self.display_surface)
 
             # Enemies
             self.enemies.draw(self.display_surface)
             self.enemies.update(self.enemy_limits, self.bullets, self.character,
-                self.tiles, self.display_surface, current_time, self.player_stats)
+            self.tiles, self.display_surface, current_time, self.player)
 
             # Bullets
             self.generate_bullet(current_time)
@@ -264,42 +274,41 @@ class Level:
 
             # Live (regeneration)
             self.live.draw(self.display_surface)
-            self.live.update(self.character, self.player_stats)
+            self.live.update(self.character, self.player)
 
             # Goal
             self.goal.draw(self.display_surface)
-            self.goal.update(self.character, self.player_stats)
+            self.goal.update(self.character, self.player)
 
             # Key
             self.key.draw(self.display_surface)
-            self.key.update(self.character, self.player_stats)
+            self.key.update(self.character, self.player)
 
             # Door
             self.door.draw(self.display_surface)
-            self.door.update(self.player_stats)
+            self.door.update(self.player)
 
             # Player
             if self.character_name == 'x':
                 self.character.update(current_time, self.tiles, self.door,
-                                    self.display_surface, self.player_stats)
+                                    self.display_surface, self.player)
             else:
                 self.character.update(current_time, self.tiles, self.door,
-                 self.display_surface, self.climb_limits, self.player_stats)
+                 self.display_surface, self.climb_limits, self.player)
+                
+            # Character switch
+            self.change_character(current_time)
             
-            # If player dies or ends the level
-            if self.character.sprite.dead or self.player_stats.end_level:
+            # Level end
+            if self.character.sprite.dead or self.level_timer == 0 or self.player.end_level:
                 self.stop = True
-                self.song.fadeout(10000)
+                pygame.mixer.music.fadeout(5000)
 
             self.character.draw(self.display_surface)
 
-            # Status Bar
-            self.update_timer(current_time)
-            self.change_character(current_time)
-
-            # Timer death
-            if self.level_timer == 0:
-                self.player_stats.health = 0
+            # Timer
+            if self.level_timer > 0:
+                self.update_timer(current_time)
 
             if editor_mode:
                 pygame.draw.rect(self.display_surface, "green", self.character.sprite.rect, 2)
@@ -311,35 +320,30 @@ class Level:
                     pygame.draw.rect(self.display_surface, "cyan", tile.rect, 2)
                 for bullet in self.bullets:
                     pygame.draw.rect(self.display_surface, "yellow", bullet.rect, 2)
+                for limit in self.enemy_limits:
+                    pygame.draw.rect(self.display_surface, "cyan", limit.rect, 2)
                 for limit in self.climb_limits:
                     pygame.draw.rect(self.display_surface, "cyan", limit.rect, 2)
                 for coin in self.coins:
                     pygame.draw.rect(self.display_surface, "yellow", coin.rect, 2)
-    
+        else:
+            if self.player.end_level and self.level_timer > 0:
+                self.level_timer -= 0.5
+                self.player.score += 25
+
+                # Rank calculator
+                if self.level_timer == 0:
+                    self.player.rank=calculate_rank(self.best_score,
+                                                self.player.score,
+                                                self.player.hits)
+            else:
+                self.player.rank = 'F'
+            
+            if len(self.player.rank) and type(self.form_flag) != dict:
+                save_level_stats(self.player, self.level)
+                self.form_flag = 'stats screen'
+        
+        # Status bar
         self.status_bar(self.display_surface)
-        if self.player_stats.end_level and self.level_timer > 0:
-            self.level_timer -= 0.5
-            self.player_stats.score += 25
         
-        if self.level_timer == 0:
-            if self.player_stats.score >= self.best_score and\
-                self.player_stats.hits == 0:
-                print(f'{self.best_score} and {self.player_stats.hits} hits: S+')
-            elif self.player_stats.score >= int(self.best_score*0.9) and\
-                self.player_stats.hits <= 1:
-                print(f'{self.best_score*0.9} and {self.player_stats.hits} hits: S')
-            elif self.player_stats.score >= int(self.best_score*0.8) and\
-                self.player_stats.hits <= 1:
-                print(f'{self.best_score*0.8} and {self.player_stats.hits} hits: A')
-            elif self.player_stats.score >= int(self.best_score*0.7) and\
-                self.player_stats.hits <= 2:
-                print(f'{self.best_score*0.7} and {self.player_stats.hits} hits: B')
-            elif self.player_stats.score >= int(self.best_score*0.5) and\
-                self.player_stats.hits <= 2:
-                print(f'{self.best_score*0.5} and {self.player_stats.hits} hits: C')
-            elif self.player_stats.score < int(self.best_score*0.5) or\
-                self.player_stats.hits <= 3:
-                print(f'{self.best_score*0.5} or {self.player_stats.hits} hits: D')
-            self.level_timer -= 0.1
-        
-        return self.stop
+        return self.form_flag

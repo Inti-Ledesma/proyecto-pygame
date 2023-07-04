@@ -29,7 +29,7 @@ class Label(Widget):
         self.render()
     
     def render(self):
-        self._slave.blit(self.img_original, (0, 0)) 
+        self._slave.blit(self.img_original, (0, 0))
         image_text = self._font.render(self._text, True, self._font_color)
         
         media_texto_horizontal = image_text.get_width() / 2

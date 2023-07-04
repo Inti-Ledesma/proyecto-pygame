@@ -58,9 +58,10 @@ class Button_Image(Widget):
             if evento.type == pygame.MOUSEBUTTONDOWN:
                 if self.slave_rect_collide.collidepoint(evento.pos):
                     if self._onclick != None and self._onclick_param!=None:
-                        self._slave = self._onclick(self._onclick_param)
+                        self._slave = self._onclick(self._onclick_param[0],
+                                                    self._onclick_param[1])
                     self.isclicked = True
-                    self.contador_click = 0
+                    # self.contador_click = 0
             elif evento.type == pygame.MOUSEBUTTONUP:
                 self._slave = self.image
         # else:

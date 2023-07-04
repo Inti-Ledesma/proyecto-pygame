@@ -108,7 +108,6 @@ class BallDeVoux(pygame.sprite.Sprite):
         if not player.invulnerable:
             if self.hitbox.colliderect(player.hitbox):
                 player.pain = True
-                player_stats.health -= 1
                 player.invulnerability_timer = pygame.time.get_ticks()
                 player.speed = 1
 
@@ -247,7 +246,6 @@ class Spiky(pygame.sprite.Sprite):
         if not player.invulnerable:
             if self.hitbox.colliderect(player.hitbox):
                 player.pain = True
-                player_stats.health -= 1
                 player.invulnerability_timer = pygame.time.get_ticks()
                 player.speed = 1
     
@@ -314,6 +312,7 @@ class GunVolt(pygame.sprite.Sprite):
             self.hitbox.y -= 20
         else:
             if self.hitbox.centerx > player.hitbox.centerx > self.hitbox.centerx-350\
+                and self.hitbox.top < player.hitbox.centery < self.hitbox.top+110\
                 and not self.attack and current_time - self.shot_timer > 2000:
                 self.status = 'start'
                 self.attack = True
@@ -351,7 +350,6 @@ class GunVolt(pygame.sprite.Sprite):
         if not player.invulnerable:
             if self.hitbox.colliderect(player.hitbox):
                 player.pain = True
-                player_stats.health -= 1
                 player.invulnerability_timer = pygame.time.get_ticks()
                 player.speed = 1
 

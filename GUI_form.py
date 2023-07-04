@@ -11,7 +11,7 @@ class Form(Widget):
         self.slave_rect.x = x
         self.slave_rect.y = y
         self.active = active
-        self.lista_widgets = []
+        self.widgets_dict = {}
         self.hijo = None
         self.dialog_result = None
         self.padre = None
@@ -26,6 +26,9 @@ class Form(Widget):
 
     def close(self):
         self.active = False
+    
+    def open(self):
+        self.active = True
 
     def verificar_dialog_result(self):
         return self.hijo == None or self.hijo.dialog_result != None

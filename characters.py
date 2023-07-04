@@ -84,7 +84,8 @@ class CharacterX(pygame.sprite.Sprite):
         elif self.pain:
             self.status = 'pain'
             if self.prev_status != 'pain':
-                player_stats.hits +=1
+                player_stats.hits += 1
+                player_stats.health -= 1
             if self.facing_right:
                 self.direction.x = -1
             else:
@@ -323,6 +324,7 @@ class CharacterBill(pygame.sprite.Sprite):
             self.status = 'pain'
             if self.prev_status != 'pain':
                 player_stats.hits += 1
+                player_stats.health -= 1
             if self.facing_right:
                 self.direction.x = -1
             else:
