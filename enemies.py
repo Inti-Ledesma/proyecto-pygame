@@ -273,7 +273,7 @@ class GunVolt(pygame.sprite.Sprite):
         self.facing_right = facing_right
         self.status = 'idle'
         self.attack = False
-        self.health = 24
+        self.health = 20
         self.got_hit = False
         self.dead = False
         self.score_value = 1000

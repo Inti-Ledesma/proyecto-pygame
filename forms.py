@@ -1,5 +1,6 @@
 import pygame
-from configurations import levels, volume
+from configurations import levels, volume, delete_data_json,\
+    delete_data_db, get_all_scores
 from GUI_button_image import *
 from GUI_button import *
 from GUI_checkbox import *
@@ -97,6 +98,8 @@ class LevelMenu(Form):
                                 self.press_button, ["resources/graphics/GUI/button boss level pressed.png", 'boss'])
         btn_play = Button_Image(self._slave, x, y, 592, 380, 96, 112, "resources/graphics/GUI/button play 2 loose.png", 
                                 self.press_button, ["resources/graphics/GUI/button play 2 pressed.png", 'level'])
+        btn_data_delete = Button_Image(self._slave, x, y, 1164, 540, 96, 112, "resources/graphics/GUI/button data delete loose.png", 
+                            self.press_button, ["resources/graphics/GUI/button data delete pressed.png", 'delete data'])
 
         self.widgets_dict['bg'] = bg
         self.widgets_dict['btn back'] = btn_back
@@ -108,6 +111,7 @@ class LevelMenu(Form):
         self.widgets_dict['btn lvl 3'] = btn_lvl_3
         self.widgets_dict['btn boss lvl'] = btn_boss_lvl
         self.widgets_dict['btn play'] = btn_play
+        self.widgets_dict['btn data delete'] = btn_data_delete
 
         # Music
         self.music_dict = {
@@ -129,7 +133,8 @@ class LevelMenu(Form):
         btn_pressed = pygame.image.load(path_btn_pressed)
         self.sfx_btn_pressed.play(0)
 
-        if key != 'back' and key != 'leaderboard' and key != 'settings' and key != 'level':
+        if key != 'back' and key != 'leaderboard' and key != 'settings'\
+            and key != 'level' and key != 'delete data':
             if self.song_name != key:
                 self.song.fadeout(200)
                 
@@ -139,11 +144,8 @@ class LevelMenu(Form):
 
                 self.song.set_volume(volume.music_volume)
                 self.song.play(-1, 0, 200)
-        else:
-            if key == 'level':
-                pass
-            else:
-                self.form_flag = key
+        elif key != 'level' or self.song_name != 'menu':
+            self.form_flag = key
 
         return btn_pressed
 
@@ -474,6 +476,141 @@ class HowToPlayMenu(Form):
                 self.widgets_dict[widget].update(events_list)
         else:
             self.song.stop()
+            self.sounds_flag = True
+
+            for widget in self.widgets_dict:
+                if widget.rfind('btn') != -1 and self.widgets_dict[widget].isclicked:
+                    self.widgets_dict[widget]._slave = self.widgets_dict[widget].image
+                else:
+                    self.widgets_dict[widget].update(events_list)
+        
+        return self.form_flag
+
+####################################################################################################################################
+
+class DeleteData(Form):
+    def __init__(self, screen, x, y, w, h, color_background, color_border="Black", border_size=-1, active=True):
+        super().__init__(screen, x, y, w, h, color_background, color_border, border_size, active)
+
+        self.form_flag = ''
+
+        bg = PictureBox(self._slave, x, y, 1280, 672, "resources/graphics/bg/main menu.png")
+        interface = PictureBox(self._slave, 384, 144, 512, 400, "resources/graphics/GUI/interface delete data.png")
+        btn_confirm = Button_Image(self._slave, x, y, 490, 320, 96, 112, "resources/graphics/GUI/button confirm loose.png", 
+                                self.press_button, ["resources/graphics/GUI/button confirm pressed.png", 'confirm'])
+        btn_denie = Button_Image(self._slave, x, y, 690, 320, 96, 112, "resources/graphics/GUI/button denie loose.png", 
+                                self.press_button, ["resources/graphics/GUI/button denie pressed.png", 'denie'])
+
+        self.widgets_dict['bg'] = bg
+        self.widgets_dict['interface'] = interface
+        self.widgets_dict['btn confirm'] = btn_confirm
+        self.widgets_dict['btn denie'] = btn_denie
+
+        # SFX
+        self.sfx_btn_pressed = pygame.mixer.Sound("resources/sfx/GUI/button pressed.mp3")
+
+        self.sounds_flag = True
+    
+    def press_button(self, path_btn_pressed, key):
+        btn_pressed = pygame.image.load(path_btn_pressed)
+        self.sfx_btn_pressed.play(0)
+        if key == 'confirm':
+            delete_data_json()
+            delete_data_db()
+        self.form_flag = key
+
+        return btn_pressed
+
+    def update(self, events_list):
+        if self.active:
+            self.form_flag = 'delete data'
+            if self.sounds_flag:
+                self.sfx_btn_pressed.set_volume(volume.sfx_volume)
+                self.sounds_flag = False
+            self.draw()
+            for widget in self.widgets_dict:
+                self.widgets_dict[widget].update(events_list)
+        else:
+            self.sounds_flag = True
+
+            for widget in self.widgets_dict:
+                if widget.rfind('btn') != -1 and self.widgets_dict[widget].isclicked:
+                    self.widgets_dict[widget]._slave = self.widgets_dict[widget].image
+                else:
+                    self.widgets_dict[widget].update(events_list)
+        
+        return self.form_flag
+
+####################################################################################################################################
+
+class Leaderboard(Form):
+    def __init__(self, screen, x, y, w, h, color_background, color_border="Black", border_size=-1, active=True):
+        super().__init__(screen, x, y, w, h, color_background, color_border, border_size, active)
+
+        self.form_flag = ''
+
+        bg = PictureBox(self._slave, x, y, 1280, 672, "resources/graphics/bg/main menu.png")
+        btn_back = Button_Image(self._slave, x, y, 20, 20, 96, 112, "resources/graphics/GUI/button back loose.png", 
+                                self.press_button, ["resources/graphics/GUI/button back pressed.png", 'back'])
+        interface = PictureBox(self._slave, 384, 61, 512, 550, "resources/graphics/GUI/interface leaderboard.png")
+        lvl_1_score = Label(self._slave, 700, 200, 120, 64,'',"Arial black",
+                            30,"black", "resources/graphics/GUI/table 1.png")
+        lvl_2_score = Label(self._slave, 700, 270, 120, 64,'',"Arial black",
+                            30,"black", "resources/graphics/GUI/table 1.png")
+        lvl_3_score = Label(self._slave, 700, 340, 120, 64,'',"Arial black",
+                            30,"black", "resources/graphics/GUI/table 1.png")
+        boss_score = Label(self._slave, 610, 415, 120, 64,'',"Arial black",
+                           30,"black", "resources/graphics/GUI/table 1.png")
+        total_score = Label(self._slave, 610, 485, 120, 64,'',"Arial black",
+                            30,"black", "resources/graphics/GUI/table 1.png")
+        
+        self.widgets_dict['bg'] = bg
+        self.widgets_dict['btn back'] = btn_back
+        self.widgets_dict['interface'] = interface
+        self.widgets_dict['lvl 1 score'] = lvl_1_score
+        self.widgets_dict['lvl 2 score'] = lvl_2_score
+        self.widgets_dict['lvl 3 score'] = lvl_3_score
+        self.widgets_dict['boss score'] = boss_score
+        self.widgets_dict['total score'] = total_score
+
+        self.scores = {
+            'lvl 1':0,
+            'lvl 2':0,
+            'lvl 3':0,
+            'boss':0,
+            'total':0,
+        }
+
+        # SFX
+        self.sfx_btn_pressed = pygame.mixer.Sound("resources/sfx/GUI/button pressed.mp3")
+
+        self.sounds_flag = True
+    
+    def press_button(self, path_btn_pressed, key):
+        btn_pressed = pygame.image.load(path_btn_pressed)
+        self.sfx_btn_pressed.play(0)
+        
+        self.form_flag = key
+
+        return btn_pressed
+
+    def update(self, events_list):
+        if self.active:
+            self.form_flag = 'leaderboard'
+            if self.sounds_flag:
+                pos = 0
+                scores = get_all_scores()
+                for key in self.scores:
+                    for widget in self.widgets_dict:
+                        if widget.rfind(key) != -1:
+                            self.widgets_dict[widget].set_text(str(scores[pos]))
+                            pos += 1
+                self.sfx_btn_pressed.set_volume(volume.sfx_volume)
+                self.sounds_flag = False
+            self.draw()
+            for widget in self.widgets_dict:
+                self.widgets_dict[widget].update(events_list)
+        else:
             self.sounds_flag = True
 
             for widget in self.widgets_dict:

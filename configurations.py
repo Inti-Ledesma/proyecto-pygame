@@ -1,5 +1,6 @@
 import pygame
 import json
+import sqlite3
 from os import walk
 
 # Volumen
@@ -36,7 +37,7 @@ level_1 = {
     '77776   15c         cc                 2',
     'ED     2╝5c   cc        24            2╝',
     'E      195c     c   00  15   B     B  19',
-    'E  P  2╝95         ^^^^^1╚333333333333╝9',
+    'E   P 2╝95         ^^^^^1╚333333333333╝9',
     '333333╝99╚3334  23333333╝999999999999999'
     ],'limits':[
     '                                        ',
@@ -292,15 +293,13 @@ def calculate_higher_rank(rank_1, rank_2):
     
     return rtn
 
+# Json
 def create_stats_json():
     # Json existence check
     try:
         with open("player stats.json", "r"):
             create_json = False
-    except FileNotFoundError:
-        create_json = True
-    
-    if create_json:
+    except Exception:
         level = {
             "score":0,
             "hits":0,
@@ -343,6 +342,88 @@ def save_level_stats(player, level):
         data[level]['rank'] = level_stats['rank']
         with open("player stats.json", 'w') as file:
             json.dump(data, file, indent=4)
+    
+    return save_data
+
+def total_score():
+    with open("player stats.json") as file:
+        data = json.load(file)
+    
+    total = 0
+
+    for level in data:
+        total += data[level]['score']
+
+    return total
+
+def delete_data_json():
+    level = {
+            "score":0,
+            "hits":0,
+            "rank":''
+        }
+
+    data = {
+        '1':level,
+        '2':level,
+        '3':level,
+        'boss':level
+    }
+    with open("player stats.json", 'w') as file:
+        json.dump(data, file, indent=4)
+
+# SQL data base
+def create_scores_db():
+    with sqlite3.connect("scores database.db") as connection:
+        try:
+            sentence = '''
+                        create table Scores
+                        (
+                            lvl1 integer,
+                            lvl2 integer,
+                            lvl3 integer,
+                            lvlboss integer,
+                            total integer
+                        )
+                        '''
+            connection.execute(sentence)
+            sentence = '''insert into Scores values(0,0,0,0,0)'''
+            connection.execute(sentence)
+        except Exception as e:
+            pass
+
+def update_scores_db(level, score):
+    with sqlite3.connect("scores database.db") as connection:
+        try:
+            sentence = f'''update Scores set lvl{level} = ?'''
+            connection.execute(sentence,(score,))
+            total = total_score()
+            sentence = '''update Scores set total = ?'''
+            connection.execute(sentence,(total,))
+        except Exception as e:
+            print("Create scores:", e)
+
+def delete_data_db():
+    with sqlite3.connect("scores database.db") as connection:
+        try:
+            sentence = '''delete from Scores'''
+            connection.execute(sentence)
+            sentence = '''insert into Scores values(0,0,0,0,0)'''
+            connection.execute(sentence)
+        except Exception as e:
+            print(e)
+
+def get_all_scores():
+    with sqlite3.connect("scores database.db") as connection:
+        try:
+            sentence = '''select * from Scores'''
+            data = connection.execute(sentence)
+            for fila in data:
+                scores = list(fila)
+        except Exception as e:
+            print(e)
+    return scores
+    
 
 # # Data collections
 

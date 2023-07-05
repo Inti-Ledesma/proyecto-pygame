@@ -2,7 +2,7 @@ import pygame
 import random
 from configurations import tile_size,import_folder, time_format,\
     fonts, health_bar_img, lives, names_initial, characters, volume,\
-    calculate_rank, level_stats_dict, save_level_stats
+    calculate_rank, level_stats_dict, save_level_stats, update_scores_db
 from objects import *
 from characters import *
 from bullets import Bullet
@@ -340,12 +340,12 @@ class Level:
                     self.player.rank=calculate_rank(self.best_score,
                                                 self.player.score,
                                                 self.player.hits)
-                    print(self.player.rank)
             else:
                 self.player.rank = 'F'
             
             if len(self.player.rank) and type(self.form_flag) != dict:
-                save_level_stats(self.player, self.level)
+                if save_level_stats(self.player, self.level):
+                    update_scores_db(self.level, self.player.score)
                 self.form_flag = 'stats screen'
         
         # Status bar

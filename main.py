@@ -9,12 +9,13 @@ screen_h = 672
 screen = pygame.display.set_mode((screen_w, screen_h))
 clock = pygame.time.Clock()
 
-from configurations import levels, create_stats_json
+from configurations import levels, create_stats_json, create_scores_db
 from level import Level
-from forms import MainMenu, LevelMenu, PauseMenu,\
-    Settings, StatsScreen, HowToPlayMenu
+from forms import MainMenu, LevelMenu, PauseMenu, Settings,\
+    StatsScreen, HowToPlayMenu, DeleteData, Leaderboard
 
 create_stats_json()
+create_scores_db()
 current_time = 0
 main_menu = MainMenu(screen,0,0,screen_w,screen_h,"black","black",1,False)
 lvl_menu = LevelMenu(screen,0,0,screen_w,screen_h,"black","black",1,False)
@@ -22,6 +23,8 @@ pause_menu = PauseMenu(screen,0,0,screen_w,screen_h,"black","black",1,False)
 settings_menu = Settings(screen,0,0,screen_w,screen_h,"black","black",1,False)
 stats_screen = StatsScreen(screen,0,0,screen_w,screen_h,"black","black",1,False)
 htp_menu = HowToPlayMenu(screen,0,0,screen_w,screen_h,"black","black",1,False)
+delete_data = DeleteData(screen,0,0,screen_w,screen_h,"black","black",1,False)
+leaderboard = Leaderboard(screen,0,0,screen_w,screen_h,"black","black",1,False)
 lvl_form = ''
 lvl_selected = ''
 open_form_flag = True
@@ -132,6 +135,28 @@ while 1:
                 open_form_flag = True
                 htp_menu.close()
                 htp_menu.update(events_list)
+        case 'delete data':
+            if open_form_flag:
+                delete_data.open()
+                open_form_flag = False
+            current_form = delete_data.update(events_list)
+            if current_form != 'delete data':
+                forms_list.pop()
+                form_pos -= 1
+                open_form_flag = True
+                delete_data.close()
+                delete_data.update(events_list)
+        case 'leaderboard':
+            if open_form_flag:
+                leaderboard.open()
+                open_form_flag = False
+            current_form = leaderboard.update(events_list)
+            if current_form != 'leaderboard':
+                forms_list.pop()
+                form_pos -= 1
+                open_form_flag = True
+                leaderboard.close()
+                leaderboard.update(events_list)
 
     pygame.display.update()
     clock.tick(60)
