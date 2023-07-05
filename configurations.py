@@ -372,6 +372,29 @@ def delete_data_json():
     with open("player stats.json", 'w') as file:
         json.dump(data, file, indent=4)
 
+def get_level_permissions():
+    with open("player stats.json") as file:
+        data = json.load(file)
+    
+    permissions = {
+        '1':True,
+        '2':False,
+        '3':False,
+        'boss':False,
+    }
+
+    permission = True
+    for level in data:
+        permissions[level] = permission
+        if data[level]['rank'] == 'S+' or\
+            data[level]['rank'] == 'S' or\
+            data[level]['rank'] == 'A':
+            permission = True
+        else:
+            permission = False
+
+    return permissions
+
 # SQL data base
 def create_scores_db():
     with sqlite3.connect("scores database.db") as connection:
@@ -423,7 +446,6 @@ def get_all_scores():
         except Exception as e:
             print(e)
     return scores
-    
 
 # # Data collections
 

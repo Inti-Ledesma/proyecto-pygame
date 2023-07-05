@@ -1,6 +1,6 @@
 import pygame
 from configurations import levels, volume, delete_data_json,\
-    delete_data_db, get_all_scores
+    delete_data_db, get_all_scores, get_level_permissions
 from GUI_button_image import *
 from GUI_button import *
 from GUI_checkbox import *
@@ -113,6 +113,13 @@ class LevelMenu(Form):
         self.widgets_dict['btn play'] = btn_play
         self.widgets_dict['btn data delete'] = btn_data_delete
 
+        self.level_permissions = {
+            '1':True,
+            '2':False,
+            '3':False,
+            '4':False
+        }
+
         # Music
         self.music_dict = {
             'menu':pygame.mixer.Sound("resources/music/level menu.mp3"),
@@ -135,7 +142,7 @@ class LevelMenu(Form):
 
         if key != 'back' and key != 'leaderboard' and key != 'settings'\
             and key != 'level' and key != 'delete data':
-            if self.song_name != key:
+            if self.song_name != key and self.level_permissions[key]:
                 self.song.fadeout(200)
                 
                 self.widgets_dict['bg'] = PictureBox(self._slave, 0, 0, 1280, 672, levels[key]['bg'])
@@ -157,6 +164,7 @@ class LevelMenu(Form):
                 self.sfx_btn_pressed.set_volume(volume.sfx_volume)
                 self.song.play(-1,0,200)
                 self.sounds_flag = False
+                self.level_permissions = get_level_permissions()
             self.draw()
             for widget in self.widgets_dict:
                 self.widgets_dict[widget].update(events_list)
