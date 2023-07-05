@@ -1,5 +1,5 @@
 import pygame
-from configurations import import_folder
+from configurations import import_folder, volume
 
 class CharacterX(pygame.sprite.Sprite):
     def __init__(self, pos:tuple, facing_right):
@@ -35,6 +35,13 @@ class CharacterX(pygame.sprite.Sprite):
         self.damage = 2
         self.fire_rate = 250
         self.dead = False
+
+        # SFX
+        self.sfx_pain = pygame.mixer.Sound("resources/sfx/characters/x/hurt.wav")
+        self.sfx_death = pygame.mixer.Sound("resources/sfx/characters/x/death.wav")
+        self.sfx_death_flag = True
+        self.sfx_pain.set_volume(volume.sfx_volume)
+        self.sfx_death.set_volume(volume.sfx_volume)
 
     def import_character_assets(self):
         character_path =\
@@ -78,6 +85,9 @@ class CharacterX(pygame.sprite.Sprite):
             prefix = 'd_'
         
         if player_stats.health <= 0:
+            if self.sfx_death_flag:
+                self.sfx_death.play(0)
+                self.sfx_death_flag = False
             self.status = 'death'
             self.shooting = False
             self.animation_speed = 0.05
@@ -88,6 +98,7 @@ class CharacterX(pygame.sprite.Sprite):
             if self.prev_status != 'pain':
                 player_stats.hits += 1
                 player_stats.health -= 1
+                self.sfx_pain.play(0)
             if self.facing_right:
                 self.direction.x = -1
             else:
@@ -255,8 +266,13 @@ class CharacterBill(pygame.sprite.Sprite):
         self.dead = False
         self.climb = False
 
-        # Bullets
-        self.bullets = pygame.sprite.Group()
+        # SFX
+        self.sfx_pain = pygame.mixer.Sound("resources/sfx/characters/bill/hurt.wav")
+        self.sfx_death = pygame.mixer.Sound("resources/sfx/characters/bill/death.wav")
+        self.sfx_death_flag = True
+
+        self.sfx_pain.set_volume(volume.sfx_volume)
+        self.sfx_death.set_volume(volume.sfx_volume)
 
     def import_character_assets(self):
         character_path =\
@@ -319,6 +335,9 @@ class CharacterBill(pygame.sprite.Sprite):
             prefix = 'd_'
         
         if player_stats.health <= 0:
+            if self.sfx_death_flag:
+                self.sfx_death.play(0)
+                self.sfx_death_flag = False
             self.status = 'death'
             self.shooting = False
             self.animation_speed = 0.05
@@ -329,6 +348,7 @@ class CharacterBill(pygame.sprite.Sprite):
             if self.prev_status != 'pain':
                 player_stats.hits += 1
                 player_stats.health -= 1
+                self.sfx_pain.play(0)
             if self.facing_right:
                 self.direction.x = -1
             else:

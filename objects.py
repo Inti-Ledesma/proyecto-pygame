@@ -1,5 +1,5 @@
 import pygame
-from configurations import import_folder
+from configurations import import_folder, volume
 
 class Coin(pygame.sprite.Sprite):
     def __init__(self, pos):
@@ -10,6 +10,8 @@ class Coin(pygame.sprite.Sprite):
         self.image = self.animations[self.frame_index]
         self.rect = self.image.get_rect(center = pos)
         self.score_value = 100
+        self.sfx = pygame.mixer.Sound("resources/sfx/objects/coin.mp3")
+        self.sfx.set_volume(volume.sfx_volume)
     
     def animate(self):
         self.frame_index += self.animation_speed
@@ -21,6 +23,7 @@ class Coin(pygame.sprite.Sprite):
     def collisions(self, player, player_stats):
         if self.rect.colliderect(player.hitbox):
             player_stats.score += self.score_value
+            self.sfx.play(0)
             self.kill()
     
     def update(self, player:pygame.sprite.GroupSingle, player_stats):
@@ -37,6 +40,9 @@ class Door(pygame.sprite.Sprite):
         self.hitbox = pygame.Rect(self.rect.x+16, self.rect.y, 32, 94)
         self.frame_index = 0
         self.animation_speed = 0.1
+        self.sfx = pygame.mixer.Sound("resources/sfx/objects/door.mp3")
+        self.sfx.set_volume(volume.sfx_volume)
+        self.sfx_flag = True
 
     def import_assets(self):
         character_path = "resources/graphics/door/"
@@ -49,6 +55,9 @@ class Door(pygame.sprite.Sprite):
             
     def check_key_grabbed(self, player_stats):
         if player_stats.key_grabbed:
+            if self.sfx_flag:
+                self.sfx.play(0)
+                self.sfx_flag = False
             self.status = 'open'
     
     def animate(self):
@@ -111,6 +120,8 @@ class Live(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft = pos)
         self.frame_index = 0
         self.animation_speed = 0.1
+        self.sfx = pygame.mixer.Sound("resources/sfx/objects/live.mp3")
+        self.sfx.set_volume(volume.sfx_volume)
 
     def animation(self):
         self.frame_index += self.animation_speed
@@ -125,6 +136,7 @@ class Live(pygame.sprite.Sprite):
         if self.rect.colliderect(player.hitbox):
             if player_stats.health < 3:
                 player_stats.health += 1
+                self.sfx.play(0)
                 self.kill()
     
     def update(self, player:pygame.sprite.GroupSingle, player_stats):

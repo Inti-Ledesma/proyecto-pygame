@@ -38,6 +38,9 @@ class Level:
         pygame.mixer.music.set_volume(volume.music_volume)
         pygame.mixer.music.play(-1)
 
+        # SFX
+        self.sfx_shot = None
+
     def import_tiles(self):
         self.tileset = {'╔':'','╗':'','╚':'','╝':'',
                         '0':'','1':'','1}':'','2':'','2}':'','3':'',
@@ -140,6 +143,7 @@ class Level:
             x = character.hitbox.x + characters[self.character_name]['bullet_spawn_xleft']
         
         if self.character_name == 'bill':
+            self.sfx_shot = pygame.mixer.Sound("resources/sfx/characters/bill/shot.wav")
             if character.crouch:
                 y = character.hitbox.y + characters[self.character_name]['bullet_spawn_ycrouch']
             else:
@@ -148,10 +152,12 @@ class Level:
             if character.look_up:
                 shoot_up = True
         else:
+            self.sfx_shot = pygame.mixer.Sound("resources/sfx/characters/x/shot.wav")
             y = character.hitbox.y + characters[self.character_name]['bullet_spawn_y']
 
         if current_time - self.bullet_delay > character.fire_rate and\
         character.shooting and len(self.bullets) < 6:
+            self.sfx_shot.play(0)
             self.bullets.add(Bullet((x,y), character.facing_right, shoot_up, path, size))
             self.bullet_delay = pygame.time.get_ticks()
 
