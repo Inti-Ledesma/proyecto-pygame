@@ -157,6 +157,7 @@ class Level:
 
         if current_time - self.bullet_delay > character.fire_rate and\
         character.shooting and len(self.bullets) < 6:
+            self.sfx_shot.set_volume(volume.sfx_volume)
             self.sfx_shot.play(0)
             self.bullets.add(Bullet((x,y), character.facing_right, shoot_up, path, size))
             self.bullet_delay = pygame.time.get_ticks()
@@ -350,6 +351,7 @@ class Level:
                 self.player.rank = 'F'
             
             if len(self.player.rank) and type(self.form_flag) != dict:
+                pygame.time.delay(250)
                 if save_level_stats(self.player, self.level):
                     update_scores_db(self.level, self.player.score)
                 self.form_flag = 'stats screen'
