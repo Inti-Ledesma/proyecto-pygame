@@ -30,7 +30,6 @@ class BallDeVoux(pygame.sprite.Sprite):
 
         # SFX
         self.sfx_explosion = pygame.mixer.Sound("resources/sfx/explosion.mp3")
-        self.sfx_explosion.set_volume(volume.sfx_volume)
     
     def import_assets(self):
         character_path = "resources/graphics/enemies/balldevoux/"
@@ -105,6 +104,7 @@ class BallDeVoux(pygame.sprite.Sprite):
                     self.health -= player.damage
                     if self.health <= 0:
                         self.dead = True
+                        self.sfx_explosion.set_volume(volume.sfx_volume)
                         self.sfx_explosion.play(0)
                         player_stats.score += self.score_value
                     bullet.kill()
@@ -154,7 +154,6 @@ class Spiky(pygame.sprite.Sprite):
 
         # SFX
         self.sfx_explosion = pygame.mixer.Sound("resources/sfx/explosion.mp3")
-        self.sfx_explosion.set_volume(volume.sfx_volume)
     
     def import_assets(self):
         character_path = "resources/graphics/enemies/spiky/"
@@ -248,6 +247,7 @@ class Spiky(pygame.sprite.Sprite):
                     self.health -= player.damage
                     if self.health <= 0:
                         self.dead = True
+                        self.sfx_explosion.set_volume(volume.sfx_volume)
                         self.sfx_explosion.play(0)
                         player_stats.score += self.score_value
                     bullet.kill()
@@ -294,9 +294,6 @@ class GunVolt(pygame.sprite.Sprite):
 
         # SFX
         self.sfx_explosion = pygame.mixer.Sound("resources/sfx/explosion.mp3")
-        self.sfx_bullet = pygame.mixer.Sound("resources/sfx/zap.mp3")
-        self.sfx_explosion.set_volume(volume.sfx_volume)
-        self.sfx_bullet.set_volume(volume.sfx_volume)
     
     def import_assets(self):
         character_path = "resources/graphics/enemies/gunvolt/"
@@ -362,7 +359,6 @@ class GunVolt(pygame.sprite.Sprite):
         y = self.hitbox.centery + 14
         self.bullets.add(GunVoltBullet((x,y),self.facing_right))
         self.bullets.add(GunVoltBullet((x+38,y),self.facing_right))
-        self.sfx_bullet.play(0)
     
     def check_collisions(self, bullets:pygame.sprite.Group, player, player_stats):
         # Bullets collision
@@ -373,6 +369,7 @@ class GunVolt(pygame.sprite.Sprite):
                     self.health -= player.damage
                     if self.health <= 0:
                         self.dead = True
+                        self.sfx_explosion.set_volume(volume.sfx_volume)
                         self.sfx_explosion.play(0)
                         player_stats.score += self.score_value
                     bullet.kill()

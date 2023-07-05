@@ -1,5 +1,5 @@
 import pygame
-from configurations import import_folder
+from configurations import import_folder, volume
 
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, pos:tuple, shoot_right:bool, shoot_up:bool,
@@ -54,6 +54,10 @@ class GunVoltBullet(pygame.sprite.Sprite):
         self.counter = 4
         self.frame_index = 0
         self.animation_speed = 0.5
+
+        self.sfx = pygame.mixer.Sound("resources/sfx/zap.mp3")
+        self.sfx.set_volume(volume.sfx_volume)
+        self.sfx.play(0)
 
     def animation(self):
         self.frame_index += self.animation_speed

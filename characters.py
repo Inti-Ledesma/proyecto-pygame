@@ -40,8 +40,6 @@ class CharacterX(pygame.sprite.Sprite):
         self.sfx_pain = pygame.mixer.Sound("resources/sfx/characters/x/hurt.wav")
         self.sfx_death = pygame.mixer.Sound("resources/sfx/characters/x/death.wav")
         self.sfx_death_flag = True
-        self.sfx_pain.set_volume(volume.sfx_volume)
-        self.sfx_death.set_volume(volume.sfx_volume)
 
     def import_character_assets(self):
         character_path =\
@@ -86,6 +84,7 @@ class CharacterX(pygame.sprite.Sprite):
         
         if player_stats.health <= 0:
             if self.sfx_death_flag:
+                self.sfx_death.set_volume(volume.sfx_volume)
                 self.sfx_death.play(0)
                 self.sfx_death_flag = False
             self.status = 'death'
@@ -98,6 +97,7 @@ class CharacterX(pygame.sprite.Sprite):
             if self.prev_status != 'pain':
                 player_stats.hits += 1
                 player_stats.health -= 1
+                self.sfx_pain.set_volume(volume.sfx_volume)
                 self.sfx_pain.play(0)
             if self.facing_right:
                 self.direction.x = -1
@@ -271,9 +271,6 @@ class CharacterBill(pygame.sprite.Sprite):
         self.sfx_death = pygame.mixer.Sound("resources/sfx/characters/bill/death.wav")
         self.sfx_death_flag = True
 
-        self.sfx_pain.set_volume(volume.sfx_volume)
-        self.sfx_death.set_volume(volume.sfx_volume)
-
     def import_character_assets(self):
         character_path =\
             "resources/graphics/characters/bill/"
@@ -336,6 +333,7 @@ class CharacterBill(pygame.sprite.Sprite):
         
         if player_stats.health <= 0:
             if self.sfx_death_flag:
+                self.sfx_death.set_volume(volume.sfx_volume)
                 self.sfx_death.play(0)
                 self.sfx_death_flag = False
             self.status = 'death'
@@ -348,6 +346,7 @@ class CharacterBill(pygame.sprite.Sprite):
             if self.prev_status != 'pain':
                 player_stats.hits += 1
                 player_stats.health -= 1
+                self.sfx_pain.set_volume(volume.sfx_volume)
                 self.sfx_pain.play(0)
             if self.facing_right:
                 self.direction.x = -1

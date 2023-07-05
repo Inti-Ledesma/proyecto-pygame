@@ -38,9 +38,6 @@ class Level:
         pygame.mixer.music.set_volume(volume.music_volume)
         pygame.mixer.music.play(-1)
 
-        # SFX
-        self.sfx_shot = None
-
     def import_tiles(self):
         self.tileset = {'╔':'','╗':'','╚':'','╝':'',
                         '0':'','1':'','1}':'','2':'','2}':'','3':'',
