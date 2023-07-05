@@ -142,10 +142,10 @@ class Spiky(pygame.sprite.Sprite):
         # Status
         self.status = 'spin'
         self.facing_left = True
-        self.health = 4
+        self.health = 5
         self.got_hit = False
         self.dead = False
-        self.score_value = 250
+        self.score_value = 300
     
     def import_assets(self):
         character_path = "resources/graphics/enemies/spiky/"
@@ -256,7 +256,7 @@ class Spiky(pygame.sprite.Sprite):
         self.animate()
 
 class GunVolt(pygame.sprite.Sprite):
-    def __init__(self, pos):
+    def __init__(self, pos, facing_right):
         super().__init__()
 
         # Animation
@@ -270,13 +270,14 @@ class GunVolt(pygame.sprite.Sprite):
         self.hitbox = pygame.Rect(self.rect.x+22, self.rect.y+14, 72, 110)
 
         # Status
+        self.facing_right = facing_right
         self.status = 'idle'
         self.attack = False
-        self.health = 16
+        self.health = 24
         self.got_hit = False
         self.dead = False
         self.score_value = 1000
-        self.shot_timer = -2500
+        self.shot_timer = 0
 
         # Bullet
         self.bullets = pygame.sprite.Group()
@@ -301,6 +302,9 @@ class GunVolt(pygame.sprite.Sprite):
                 self.kill()
         image = animation[int(self.frame_index)]
 
+        if self.facing_right:
+            image = pygame.transform.flip(image,True,False)
+
         self.image = image
         self.rect.x, self.rect.y = self.hitbox.x-22, self.hitbox.y-14
         self.direction = -1
@@ -311,13 +315,22 @@ class GunVolt(pygame.sprite.Sprite):
             self.status = 'explosion'
             self.hitbox.y -= 20
         else:
-            if self.hitbox.centerx > player.hitbox.centerx > self.hitbox.centerx-350\
-                and self.hitbox.top < player.hitbox.centery < self.hitbox.top+110\
-                and not self.attack and current_time - self.shot_timer > 2000:
-                self.status = 'start'
-                self.attack = True
-                self.frame_index = 0
-                self.shot_timer = pygame.time.get_ticks()
+            if not self.facing_right:
+                if self.hitbox.centerx > player.hitbox.centerx > self.hitbox.centerx-350\
+                    and self.hitbox.top < player.hitbox.centery < self.hitbox.top+110\
+                    and not self.attack and current_time - self.shot_timer > 2000:
+                    self.status = 'start'
+                    self.attack = True
+                    self.frame_index = 0
+                    self.shot_timer = pygame.time.get_ticks()
+            else:
+                if self.hitbox.centerx < player.hitbox.centerx < self.hitbox.centerx+350\
+                    and self.hitbox.top < player.hitbox.centery < self.hitbox.top+110\
+                    and not self.attack and current_time - self.shot_timer > 2000:
+                    self.status = 'start'
+                    self.attack = True
+                    self.frame_index = 0
+                    self.shot_timer = pygame.time.get_ticks()
             
             if self.status == 'start' and self.frame_index + self.animation_speed > len(self.animations['start']):
                 self.generate_bullets()
@@ -331,12 +344,12 @@ class GunVolt(pygame.sprite.Sprite):
     def generate_bullets(self):
         x = self.hitbox.centerx - 30
         y = self.hitbox.centery + 14
-        self.bullets.add(GunVoltBullet((x,y)))
-        self.bullets.add(GunVoltBullet((x+38,y)))
+        self.bullets.add(GunVoltBullet((x,y),self.facing_right))
+        self.bullets.add(GunVoltBullet((x+38,y),self.facing_right))
     
     def check_collisions(self, bullets:pygame.sprite.Group, player, player_stats):
         # Bullets collision
-        if len(bullets):
+        if len(bullets) and self.attack:
             for bullet in bullets.sprites():
                 if self.hitbox.colliderect(bullet): 
                     self.got_hit = True

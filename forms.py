@@ -140,8 +140,8 @@ class LevelMenu(Form):
                 self.song.set_volume(volume.music_volume)
                 self.song.play(-1, 0, 200)
         else:
-            if key == 'level' and self.song_name == 'menu':
-                print("No level selected")
+            if key == 'level':
+                pass
             else:
                 self.form_flag = key
 
@@ -483,5 +483,3 @@ class HowToPlayMenu(Form):
                     self.widgets_dict[widget].update(events_list)
         
         return self.form_flag
-
-        

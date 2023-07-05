@@ -43,13 +43,14 @@ class Bullet(pygame.sprite.Sprite):
         self.move()
 
 class GunVoltBullet(pygame.sprite.Sprite):
-    def __init__(self, pos):
+    def __init__(self, pos, move_right):
         super().__init__()
         self.animations = import_folder("resources/graphics/enemies/gunvolt/shot", (32,32))
         self.image = self.animations[0]
         self.rect = self.image.get_rect(center = pos)
 
         # Status
+        self.move_right = move_right
         self.counter = 4
         self.frame_index = 0
         self.animation_speed = 0.5
@@ -66,7 +67,10 @@ class GunVoltBullet(pygame.sprite.Sprite):
         if self.counter:
             self.rect.y += 6
             self.counter -= 1
-        self.rect.x -= 10
+        if self.move_right:
+            self.rect.x += 10
+        else:
+            self.rect.x -= 10
     
     def check_collissions(self, tiles:pygame.sprite.Group, screen, player):
         # Tiles collision
@@ -85,7 +89,6 @@ class GunVoltBullet(pygame.sprite.Sprite):
         if not player.invulnerable:
             if self.rect.colliderect(player.hitbox):
                 player.pain = True
-                player.health -= 1
                 player.invulnerability_timer = pygame.time.get_ticks()
                 player.speed = 1
     

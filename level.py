@@ -51,7 +51,7 @@ class Level:
 
     def level_setup(self, level_size, layout, lvl_limits):
         self.bg = pygame.image.load("resources/graphics/bg/"+ self.level +".png")
-        self.bg = pygame.transform.scale(self.bg, level_size)
+        self.bg = pygame.transform.scale(self.bg, level_size).convert_alpha()
 
         self.tiles = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
@@ -81,6 +81,10 @@ class Level:
                     tile = Tile((x,y), self.tileset[cell], climbable)
                     self.tiles.add(tile)
                 else:
+                    facing_right = False
+                    if cell == 'g':
+                        cell = 'G'
+                        facing_right = True
                     match cell:
                         case '^':
                             spike = Spike((x,y))
@@ -98,7 +102,7 @@ class Level:
                             self.best_score += enemy.score_value
                             self.enemies.add(enemy)
                         case 'G':
-                            enemy = GunVolt((x,y+36))
+                            enemy = GunVolt((x,y+36),facing_right)
                             self.best_score += enemy.score_value
                             self.enemies.add(enemy)
                         case 'E':
@@ -191,7 +195,7 @@ class Level:
         character = self.character.sprite
 
         if keys[pygame.K_SPACE] and not (character.pain or character.dead)\
-        and current_time - self.character_change_delay > 1500:
+        and current_time - self.character_change_delay > 1000:
             self.player.facing_right = self.character.sprite.facing_right
             block = False
             if self.character_name == 'x':
@@ -262,10 +266,9 @@ class Level:
             self.coins.update(self.character, self.player)
             self.coins.draw(self.display_surface)
 
-            # Enemies
-            self.enemies.draw(self.display_surface)
-            self.enemies.update(self.enemy_limits, self.bullets, self.character,
-            self.tiles, self.display_surface, current_time, self.player)
+            # Goal
+            self.goal.draw(self.display_surface)
+            self.goal.update(self.character, self.player)
 
             # Bullets
             self.generate_bullet(current_time)
@@ -276,10 +279,6 @@ class Level:
             self.live.draw(self.display_surface)
             self.live.update(self.character, self.player)
 
-            # Goal
-            self.goal.draw(self.display_surface)
-            self.goal.update(self.character, self.player)
-
             # Key
             self.key.draw(self.display_surface)
             self.key.update(self.character, self.player)
@@ -287,6 +286,11 @@ class Level:
             # Door
             self.door.draw(self.display_surface)
             self.door.update(self.player)
+
+            # Enemies
+            self.enemies.draw(self.display_surface)
+            self.enemies.update(self.enemy_limits, self.bullets, self.character,
+            self.tiles, self.display_surface, current_time, self.player)
 
             # Player
             if self.character_name == 'x':
@@ -302,7 +306,7 @@ class Level:
             # Level end
             if self.character.sprite.dead or self.level_timer == 0 or self.player.end_level:
                 self.stop = True
-                pygame.mixer.music.fadeout(5000)
+                pygame.mixer.music.fadeout(4000)
 
             self.character.draw(self.display_surface)
 
@@ -336,6 +340,7 @@ class Level:
                     self.player.rank=calculate_rank(self.best_score,
                                                 self.player.score,
                                                 self.player.hits)
+                    print(self.player.rank)
             else:
                 self.player.rank = 'F'
             

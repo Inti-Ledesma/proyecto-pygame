@@ -79,9 +79,11 @@ class CharacterX(pygame.sprite.Sprite):
         
         if player_stats.health <= 0:
             self.status = 'death'
+            self.shooting = False
             self.animation_speed = 0.05
             self.direction.x = 0
         elif self.pain:
+            self.shooting = False
             self.status = 'pain'
             if self.prev_status != 'pain':
                 player_stats.hits += 1
@@ -318,9 +320,11 @@ class CharacterBill(pygame.sprite.Sprite):
         
         if player_stats.health <= 0:
             self.status = 'death'
+            self.shooting = False
             self.animation_speed = 0.05
             self.direction.x = 0
         elif self.pain:
+            self.shooting = False
             self.status = 'pain'
             if self.prev_status != 'pain':
                 player_stats.hits += 1
