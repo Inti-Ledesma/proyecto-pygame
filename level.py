@@ -66,6 +66,7 @@ class Level:
         self.character = pygame.sprite.GroupSingle()
         self.door = pygame.sprite.GroupSingle()
         self.key = pygame.sprite.GroupSingle()
+        self.sign = pygame.sprite.GroupSingle()
         self.enemy_limits = []
         self.climb_limits = []
         
@@ -120,6 +121,9 @@ class Level:
                         case 'K':
                             key = Key((x,y))
                             self.key.add(key)
+                        case 'U':
+                            sign = UnderConstructionSign((x,y+32))
+                            self.sign.add(sign)
                         case 'P':
                             player = CharacterX((x,y-14), self.player.facing_right)
                             self.character.add(player)
@@ -306,6 +310,8 @@ class Level:
             else:
                 self.character.update(current_time, self.tiles, self.door,
                  self.display_surface, self.climb_limits, self.player)
+                
+            self.sign.draw(self.display_surface)
                 
             # Character switch
             self.change_character(current_time)

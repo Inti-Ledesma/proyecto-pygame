@@ -167,3 +167,9 @@ class Tile(pygame.sprite.Sprite):
         self.image = surface
         self.rect = self.image.get_rect(topleft = pos)
         self.climbable = climbable
+
+class UnderConstructionSign(pygame.sprite.Sprite):
+    def __init__(self, pos):
+        super().__init__()
+        self.image = pygame.image.load("resources/graphics/under construction.png")
+        self.rect = self.image.get_rect(bottomleft = pos)
