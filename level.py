@@ -61,8 +61,11 @@ class Level:
         self.goal = pygame.sprite.Group()
         self.live = pygame.sprite.GroupSingle()
         self.character = pygame.sprite.GroupSingle()
-        self.door = pygame.sprite.GroupSingle()
+        self.boss = pygame.sprite.GroupSingle()
+        self.doors = pygame.sprite.Group()
         self.key = pygame.sprite.GroupSingle()
+        self.lasers = pygame.sprite.Group()
+        self.buttons = pygame.sprite.Group()
         self.sign = pygame.sprite.GroupSingle()
         self.enemy_limits = []
         self.climb_limits = []
@@ -82,10 +85,14 @@ class Level:
                     tile = Tile((x,y), self.tileset[cell], climbable)
                     self.tiles.add(tile)
                 else:
+                    laser_status = 'on'
                     facing_right = False
                     if cell == 'g':
                         cell = 'G'
                         facing_right = True
+                    elif cell == 'l':
+                        cell = 'L'
+                        laser_status = 'off'
                     match cell:
                         case '^':
                             spike = Spike((x,y))
@@ -99,27 +106,37 @@ class Level:
                             self.best_score += enemy.score_value
                             self.enemies.add(enemy)
                         case 'S':
-                            enemy = Spiky((x,y+36))
+                            enemy = Spiky((x,y+38), 300)
                             self.best_score += enemy.score_value
                             self.enemies.add(enemy)
                         case 'G':
                             enemy = GunVolt((x,y+36),facing_right)
                             self.best_score += enemy.score_value
                             self.enemies.add(enemy)
+                        case 'R':
+                            boss = RoboBigFuzz((x,y))
+                            self.best_score += boss.score_value
+                            self.boss.add(boss)
                         case 'E':
                             goal = Goal((x,y))
                             self.goal.add(goal)
-                        case 'L':
-                            live = Live((x,y))
-                            self.live.add(live)
+                        case 'H':
+                            health = Health((x,y))
+                            self.live.add(health)
                         case 'D':
-                            door = Door((x,y))
-                            self.door.add(door)
+                            door = Door((x-16,y+32))
+                            self.doors.add(door)
                         case 'K':
                             key = Key((x,y))
                             self.key.add(key)
+                        case 'L':
+                            laser = Laser((x,y+32), laser_status)
+                            self.lasers.add(laser)
+                        case 'O':
+                            button = Button((x+16,y))
+                            self.buttons.add(button)
                         case 'U':
-                            sign = UnderConstructionSign((x,y+32))
+                            sign = UnderConstructionSign((x-16,y+32))
                             self.sign.add(sign)
                         case 'P':
                             player = CharacterX((x,y-14), self.player.facing_right)
@@ -225,8 +242,8 @@ class Level:
                     self.character_change_delay = pygame.time.get_ticks()
             else:
                 for tile in self.tiles.sprites():
-                    new_pos_1 = ((character.hitbox.centerx-12, character.hitbox.centery))
-                    new_pos_2 = ((character.hitbox.centerx+12, character.hitbox.centery))
+                    new_pos_1 = ((character.hitbox.centerx-18, character.hitbox.centery))
+                    new_pos_2 = ((character.hitbox.centerx+18, character.hitbox.centery))
 
                     if tile.rect.x <= new_pos_1[0] < tile.rect.x+32 and\
                         tile.rect.y <= new_pos_1[1] < tile.rect.y+32 or\
@@ -241,8 +258,8 @@ class Level:
                     self.character_name = 'x'
                     self.character_change_delay = pygame.time.get_ticks()
 
-    def run(self, current_time, editor_mode, events_list):
-        if self.form_flag != 'stats screen':
+    def run(self, current_time, events_list):
+        if self.form_flag != 'rank screen':
             self.form_flag = 'level'
         else:
             self.form_flag = level_stats_dict(self.player)
@@ -259,9 +276,51 @@ class Level:
                         pygame.mixer.music.pause()
                         self.music_flag = True
                         self.form_flag = 'pause'
+            
+            if self.level == 'boss':
+                # Background layer 1 (boss)
+                self.display_surface.fill('black')
+
+                # Boss
+                self.boss.draw(self.display_surface)
+                self.boss.update(self.display_surface, self.tiles, self.character, 'self', self.bullets, self.player)
+
+                if len(self.boss):
+                    if self.boss.sprite.cover_blocks:
+                        self.tiles.add(Tile((416,480), self.tileset['0'], False))
+                        self.tiles.add(Tile((448,480), self.tileset['0'], False))
+                        self.tiles.add(Tile((800,480), self.tileset['0'], False))
+                        self.tiles.add(Tile((832,480), self.tileset['0'], False))
+                    elif 4700 < pygame.time.get_ticks() - self.boss.sprite.attack_delay < 4720:
+                        counter = 0
+                        for tile in self.tiles:
+                            counter += 1
+                            if counter > 70:
+                                self.tiles.remove_internal(tile)
+                    
+                    if not self.boss.sprite.second_phase and self.boss.sprite.health <= 50:
+                        self.spikes.add(Spike((352,576)))
+                        self.spikes.add(Spike((384,576)))
+                        self.spikes.add(Spike((416,576)))
+                        self.spikes.add(Spike((448,576)))
+                        self.spikes.add(Spike((480,576)))
+
+                        self.spikes.add(Spike((768,576)))
+                        self.spikes.add(Spike((800,576)))
+                        self.spikes.add(Spike((832,576)))
+                        self.spikes.add(Spike((864,576)))
+                        self.spikes.add(Spike((896,576)))
+                        
+                        self.boss.sprite.second_phase = True
+                else:
+                    self.player.end_level = True
 
             # Background
             self.display_surface.blit(self.bg, (0,0))
+
+            if self.level == 'boss':
+                # Boss bullets
+                self.boss.update(self.display_surface, self.tiles, self.character, 'bullets', self.bullets, self.player)
 
             # Level Tiles
             self.tiles.draw(self.display_surface)
@@ -292,8 +351,16 @@ class Level:
             self.key.update(self.character, self.player)
 
             # Door
-            self.door.draw(self.display_surface)
-            self.door.update(self.player)
+            self.doors.draw(self.display_surface)
+            self.doors.update(self.player)
+
+            # Buttons
+            self.buttons.draw(self.display_surface)
+            self.buttons.update(self.bullets)
+
+            # Lasers
+            self.lasers.draw(self.display_surface)
+            self.lasers.update(self.character, self.bullets, self.buttons)
 
             # Enemies
             self.enemies.draw(self.display_surface)
@@ -302,10 +369,10 @@ class Level:
 
             # Player
             if self.character_name == 'x':
-                self.character.update(current_time, self.tiles, self.door,
+                self.character.update(current_time, self.tiles, self.doors,
                                     self.display_surface, self.player)
             else:
-                self.character.update(current_time, self.tiles, self.door,
+                self.character.update(current_time, self.tiles, self.doors,
                  self.display_surface, self.climb_limits, self.player)
                 
             self.sign.draw(self.display_surface)
@@ -323,27 +390,10 @@ class Level:
             # Timer
             if self.level_timer > 0:
                 self.update_timer(current_time)
-
-            if editor_mode:
-                pygame.draw.rect(self.display_surface, "green", self.character.sprite.rect, 2)
-                pygame.draw.rect(self.display_surface, "red", self.character.sprite.hitbox, 2)
-                for enemy in self.enemies:
-                    pygame.draw.rect(self.display_surface, "green", enemy.rect, 2)
-                    pygame.draw.rect(self.display_surface, "red", enemy.hitbox, 2)
-                for tile in self.tiles:
-                    pygame.draw.rect(self.display_surface, "cyan", tile.rect, 2)
-                for bullet in self.bullets:
-                    pygame.draw.rect(self.display_surface, "yellow", bullet.rect, 2)
-                for limit in self.enemy_limits:
-                    pygame.draw.rect(self.display_surface, "cyan", limit.rect, 2)
-                for limit in self.climb_limits:
-                    pygame.draw.rect(self.display_surface, "cyan", limit.rect, 2)
-                for coin in self.coins:
-                    pygame.draw.rect(self.display_surface, "yellow", coin.rect, 2)
         else:
             if self.player.end_level and self.level_timer > 0:
                 self.level_timer -= 0.5
-                self.player.score += 25
+                self.player.score += 50
 
                 # Rank calculator
                 if self.level_timer == 0:
@@ -357,7 +407,7 @@ class Level:
                 pygame.time.delay(250)
                 if save_level_stats(self.player, self.level):
                     update_scores_db(self.level, self.player.score)
-                self.form_flag = 'stats screen'
+                self.form_flag = 'rank screen'
         
         # Status bar
         self.status_bar(self.display_surface)

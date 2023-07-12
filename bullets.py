@@ -100,3 +100,51 @@ class GunVoltBullet(pygame.sprite.Sprite):
         self.move()
         self.animation()
         self.check_collissions(tiles, screen, player.sprite)
+
+class RoboBigFuzzBullet(pygame.sprite.Sprite):
+    def __init__(self, pos, direction):
+        super().__init__()
+        self.animations = import_folder("resources/graphics/enemies/boss/bullet", (90,90))
+        self.image = self.animations[0]
+        self.rect = self.image.get_rect(center = pos)
+
+        # Status
+        self.frame_index = 0
+        self.animation_speed = 0.3
+
+        # Direction
+        self.direction = direction
+
+        self.sfx = pygame.mixer.Sound("resources/sfx/flame.mp3")
+        self.sfx.set_volume(volume.sfx_volume)
+        self.sfx.play(0)
+
+    def animation(self):
+        self.frame_index += self.animation_speed
+        if self.frame_index >= len(self.animations):
+            self.frame_index = 0
+        
+        image = self.animations[int(self.frame_index)]
+        self.image = image
+
+    def move(self):
+        self.rect.x += self.direction[0]
+        self.rect.y += self.direction[1]
+    
+    def check_collissions(self, tiles:pygame.sprite.Group, player):
+        # Tiles collision
+        for tile in tiles.sprites():
+            if self.rect.colliderect(tile):
+                self.kill()
+        
+        # Player collision
+        if not player.invulnerable:
+            if self.rect.colliderect(player.hitbox):
+                player.pain = True
+                player.invulnerability_timer = pygame.time.get_ticks()
+                player.speed = 1
+    
+    def update(self, tiles, player:pygame.sprite.GroupSingle):
+        self.move()
+        self.animation()
+        self.check_collissions(tiles, player.sprite)

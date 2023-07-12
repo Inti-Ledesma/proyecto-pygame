@@ -13,7 +13,7 @@ volume = Volume()
 tile_size = 32
 
 # Level layout
-#╔  ╗  ╚  ╝
+#╔  ╗  ╚  ╝ ^
 
 level_1 = {
     'bg':"resources/graphics/bg/1.png",
@@ -26,7 +26,7 @@ level_1 = {
     '3333333333333334                        ',
     '╔77777777777╗╔76   c     c              ',
     '5           15                          ',
-    '5   c      c15 L   0     0    c         ',
+    '5   c      c15 H   0     0    c         ',
     '5          c15        S                 ',
     '5c  2334    1╚334^^^^^^^^^^^234         ',
     '5   87╗╚34  1999╚33333333333╝╔6    c    ',
@@ -35,9 +35,9 @@ level_1 = {
     '9╚4     15c                      876   c',
     '99╚34   15c             c               ',
     '77776   15c         cc                 2',
-    'ED     2╝5c   cc        24            2╝',
+    'E      2╝5c   cc        24            2╝',
     'E      195c     c   00  15   B     B  19',
-    'E   P 2╝95         ^^^^^1╚333333333333╝9',
+    'ED  P 2╝95         ^^^^^1╚333333333333╝9',
     '333333╝99╚3334  23333333╝999999999999999'
     ],'limits':[
     '                                        ',
@@ -62,7 +62,7 @@ level_1 = {
     '          ¡                             ',
     '                                        '
     ],'song':'resources/music/level_1.ogg',
-    'time':120, 'best_time_score':4500
+    'time':120, 'best_time_score':9000
 }
 
 level_2 = {
@@ -70,10 +70,10 @@ level_2 = {
     'level_layout':[
     '                                        ',
     '                                        ',
-    '6                        15  86         ',
-    '     L                   15  D          ',
+    '76                       15  86         ',
+    '     H                   15             ',
     '           c             15  cc         ',
-    '4000000   234            15             ',
+    '4000000   234            15  DD         ',
     '5   cc    195            15  24c        ',
     '5         195g           15  15   cccc  ',
     '5  2333333╝9╚33333334   c15  15         ',
@@ -111,8 +111,8 @@ level_2 = {
     '                              }         ',
     '                              }         ',
     '                               ¡        '
-    ],'song':'resources/music/level_2.ogg',
-    'time':150, 'best_time_score':5250
+    ],'song':'resources/music/level_2.mp3',
+    'time':120, 'best_time_score':7500
 }
 
 level_3 = {
@@ -120,73 +120,73 @@ level_3 = {
     'level_layout':[
     '                                        ',
     '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                       P',
-    '                                  233333',
-    '                                  199999',
-    '                                  877777',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                  U                    E',
-    '3333333333333333334  2333333333333333333'
+    '9999999995K         0   0        15     ',
+    '9999999995                       15     ',
+    '╔77777777600 c  c   c   c   c   O15    P',
+    '5                   L   l        15  233',
+    '5   c        0^^0^^^0^^^0^^^0  c 15  877',
+    '5     L      8777777777777776    15     ',
+    '5   233334                     0 15  c  ',
+    '5 23╝╔77╗5                       15^    ',
+    '5 8776cO15                       1╚334  ',
+    '5       15            c          1╔876  ',
+    '5       15 S                  G  15     ',
+    '5 c     1╚333333334  233333333333╝5 c   ',
+    '5    G  199999╔7776  8777╗999999995    ^',
+    '5 233333╝99╔776          877╗999995 2333',
+    '5 8777777776     c    c     8777776 877╗',
+    '5             c          c             1',
+    '5 c   c   c     234  234       c    c O1',
+    '5 B   B   B  233╝95EE19╚334  l   L     1',
+    '╚333333333333╝99995DD19999╚333333333333╝'
     ],'limits':[
     '                                        ',
     '                                        ',
     '                                        ',
     '                                        ',
     '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
+    ' ¡                              ¡       ',
+    '                                 }      ',
+    '}                                }      ',
+    '}                                }      ',
+    '}                                }      ',
+    '}                                }      ',
+    '}                                }      ',
+    '}                               ¡       ',
+    '}                                       ',
+    '}                                       ',
+    '}                                       ',
+    '}                                       ',
+    '}                                       ',
+    '!            !                          ',
+    ' ¡                                      ',
     '                                        '
     ],'song':'resources/music/level_3.mp3',
-    'time':120, 'best_time_score':4500
+    'time':120, 'best_time_score':8500
 }
 
 boss_level = {
     'bg':"resources/graphics/bg/boss.png",
     'level_layout':[
-    '                   P                    ',
     '                                        ',
     '                                        ',
     '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                       E',
-    '3333333333         U          3333333333',
+    '          77777777777777777777          ',
+    '         5                    1         ',
+    '         5                    1         ',
+    '         5                   H1         ',
+    '         5 R                  1         ',
+    '         5                    1         ',
+    '         5                    1         ',
+    '         5                    1         ',
+    '         5                    1         ',
+    '         5                    1         ',
+    '         5                    1         ',
+    '         5                    1         ',
+    '         5          P         1         ',
+    '         5                    1         ',
+    '         5                    1         ',
+    '         5                    1         ',
     '          33333333333333333333          ',
     '                                        '
     ],'limits':[
@@ -195,24 +195,24 @@ boss_level = {
     '                                        ',
     '                                        ',
     '                                        ',
+    '          ¡                  ¡          ',
     '                                        ',
+    '         }                    }         ',
+    '         }                    }         ',
+    '         }                    }         ',
+    '         }                    }         ',
+    '         }                    }         ',
+    '         }                    }         ',
+    '         }                    }         ',
+    '         }                    }         ',
+    '         }                    }         ',
+    '         }                    }         ',
+    '         }                    }         ',
     '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
-    '                                        ',
+    '          ¡                  ¡          ',
     '                                        '
     ],'song':'resources/music/boss.ogg',
-    'time':120, 'best_time_score':4500
+    'time':120, 'best_time_score':8600
 }
 
 levels = {
@@ -257,13 +257,13 @@ def calculate_rank(best_score, player_score, hits):
         rank = 'S'
     elif player_score >= int(best_score*0.8) and hits <= 1:
         rank = 'A'
-    elif player_score >= int(best_score*0.65) and hits <= 2:
+    elif player_score >= int(best_score*0.7) and hits <= 2:
         rank = 'B'
-    elif player_score >= int(best_score*0.5) and hits <= 2:
+    elif player_score >= int(best_score*0.6) and hits <= 2:
         rank = 'C'
     else:
         rank = 'D'
-    
+            
     return rank
 
 def calculate_higher_rank(rank_1, rank_2):
@@ -298,7 +298,7 @@ def create_stats_json():
     # Json existence check
     try:
         with open("player stats.json", "r"):
-            create_json = False
+            pass
     except Exception:
         level = {
             "score":0,
@@ -400,8 +400,10 @@ def create_scores_db():
     with sqlite3.connect("scores database.db") as connection:
         try:
             sentence = '''
-                        create table Scores
+                        CREATE TABLE Scores
                         (
+                            id integer PRIMARY KEY AUTOINCREMENT,
+                            username text,
                             lvl1 integer,
                             lvl2 integer,
                             lvl3 integer,
@@ -410,7 +412,23 @@ def create_scores_db():
                         )
                         '''
             connection.execute(sentence)
-            sentence = '''insert into Scores values(0,0,0,0,0)'''
+            sentence = '''INSERT INTO Scores (username,lvl1,lvl2,lvl3,lvlboss,total)
+                        VALUES("User",0,0,0,0,0)'''
+            connection.execute(sentence)
+            sentence = '''INSERT INTO Scores (username,lvl1,lvl2,lvl3,lvlboss,total)
+                        VALUES("Doomer",13200,14800,14400,18500,60900)'''
+            connection.execute(sentence)
+            sentence = '''INSERT INTO Scores (username,lvl1,lvl2,lvl3,lvlboss,total)
+                        VALUES("Mark",13000,14600,13900,18200,59800)'''
+            connection.execute(sentence)
+            sentence = '''INSERT INTO Scores (username,lvl1,lvl2,lvl3,lvlboss,total)
+                        VALUES("Melody",12900,14400,13700,18100,59100)'''
+            connection.execute(sentence)
+            sentence = '''INSERT INTO Scores (username,lvl1,lvl2,lvl3,lvlboss,total)
+                        VALUES("ARandomGuy",12700,14300,13500,17600,58100)'''
+            connection.execute(sentence)
+            sentence = '''INSERT INTO Scores (username,lvl1,lvl2,lvl3,lvlboss,total)
+                        VALUES("TheWorst",12000,13900,13100,16400,55400)'''
             connection.execute(sentence)
         except Exception as e:
             pass
@@ -418,20 +436,25 @@ def create_scores_db():
 def update_scores_db(level, score):
     with sqlite3.connect("scores database.db") as connection:
         try:
-            sentence = f'''update Scores set lvl{level} = ?'''
-            connection.execute(sentence,(score,))
             total = total_score()
-            sentence = '''update Scores set total = ?'''
-            connection.execute(sentence,(total,))
+            sentence = f'''UPDATE Scores
+                        SET lvl{level} = ?,
+                            total = ?
+                        WHERE id = 1''' 
+            connection.execute(sentence,(score,total))
         except Exception as e:
-            print("Create scores:", e)
+            print(f"Update scores db: {e}")
 
 def delete_data_db():
     with sqlite3.connect("scores database.db") as connection:
         try:
-            sentence = '''delete from Scores'''
-            connection.execute(sentence)
-            sentence = '''insert into Scores values(0,0,0,0,0)'''
+            sentence = '''UPDATE Scores 
+                        SET lvl1 = 0,
+                            lvl2 = 0,
+                            lvl3 = 0,
+                            lvlboss = 0,
+                            total = 0
+                        WHERE id = 1'''
             connection.execute(sentence)
         except Exception as e:
             print(e)
@@ -439,13 +462,54 @@ def delete_data_db():
 def get_all_scores():
     with sqlite3.connect("scores database.db") as connection:
         try:
-            sentence = '''select * from Scores'''
+            sentence = '''SELECT lvl1, lvl2, lvl3, lvlboss, total
+                        FROM Scores
+                        WHERE id = 1'''
             data = connection.execute(sentence)
             for fila in data:
                 scores = list(fila)
         except Exception as e:
-            print(e)
+            print(f"Get all scores: {e}")
+    
     return scores
+
+def save_username(new_username):
+    try:
+        with sqlite3.connect("scores database.db") as connection:
+            sentence = '''UPDATE Scores
+                        SET username = ?
+                        WHERE id = 1'''
+            connection.execute(sentence,(new_username,))
+    except Exception as e:
+        print(f"Save username: {e}")
+
+def obtain_top_5_players_data():
+    top_5_players = {
+        '1':None,
+        '2':None,
+        '3':None,
+        '4':None,
+        '5':None,
+    }
+
+    try:
+        with sqlite3.connect("scores database.db") as connection:
+            sentence = '''SELECT username,total FROM Scores
+                        ORDER BY total DESC LIMIT 5'''
+            data = connection.execute(sentence)
+            counter = 0
+            for file in data:
+                player = {}
+                counter += 1
+
+                player['username'] = file[0]
+                player['total'] = file[1]
+
+                top_5_players[str(counter)] = player
+    except Exception as e:
+        print(f"Obtain leaderboard data: {e}")
+    
+    return top_5_players
 
 # # Data collections
 

@@ -12,19 +12,20 @@ clock = pygame.time.Clock()
 from configurations import levels, create_stats_json, create_scores_db
 from level import Level
 from forms import MainMenu, LevelMenu, PauseMenu, Settings,\
-    StatsScreen, HowToPlayMenu, DeleteData, Leaderboard
+    RankScreen, HowToPlayMenu, DeleteData, PersonalStats
 
 create_stats_json()
 create_scores_db()
-current_time = 0
+
 main_menu = MainMenu(screen,0,0,screen_w,screen_h,"black","black",1,False)
 lvl_menu = LevelMenu(screen,0,0,screen_w,screen_h,"black","black",1,False)
 pause_menu = PauseMenu(screen,0,0,screen_w,screen_h,"black","black",1,False)
 settings_menu = Settings(screen,0,0,screen_w,screen_h,"black","black",1,False)
-stats_screen = StatsScreen(screen,0,0,screen_w,screen_h,"black","black",1,False)
+rank_screen = RankScreen(screen,0,0,screen_w,screen_h,"black","black",1,False)
 htp_menu = HowToPlayMenu(screen,0,0,screen_w,screen_h,"black","black",1,False)
 delete_data = DeleteData(screen,0,0,screen_w,screen_h,"black","black",1,False)
-leaderboard = Leaderboard(screen,0,0,screen_w,screen_h,"black","black",1,False)
+personal_stats = PersonalStats(screen,0,0,screen_w,screen_h,"black","black",1,False)
+
 lvl_form = ''
 lvl_selected = ''
 open_form_flag = True
@@ -74,11 +75,11 @@ while 1:
             if open_form_flag:
                 lvl_form = Level(screen,levels[lvl_selected],lvl_selected)
                 open_form_flag = False
-            current_form = lvl_form.run(pygame.time.get_ticks(), get_mode(), events_list)
+            current_form = lvl_form.run(pygame.time.get_ticks(), events_list)
             if current_form != 'level':
                 forms_list.append(current_form)
                 form_pos += 1
-                level_stats = lvl_form.run(pygame.time.get_ticks(), get_mode(), events_list)
+                level_stats = lvl_form.run(pygame.time.get_ticks(), events_list)
                 open_form_flag = True
         case 'settings':
             if open_form_flag:
@@ -112,18 +113,18 @@ while 1:
                 
                 pause_menu.close()
                 pause_menu.update(events_list)
-        case 'stats screen':
+        case 'rank screen':
             if open_form_flag:
-                stats_screen.open()
+                rank_screen.open()
                 open_form_flag = False
-            current_form = stats_screen.update(events_list, level_stats)
-            if current_form != 'stats screen':
+            current_form = rank_screen.update(events_list, level_stats)
+            if current_form != 'rank screen':
                 forms_list.pop()
                 forms_list.pop()
                 form_pos -= 2
                 open_form_flag = True
-                stats_screen.close()
-                stats_screen.update(events_list, level_stats)
+                rank_screen.close()
+                rank_screen.update(events_list, level_stats)
         case 'htp':
             if open_form_flag:
                 htp_menu.open()
@@ -146,17 +147,17 @@ while 1:
                 open_form_flag = True
                 delete_data.close()
                 delete_data.update(events_list)
-        case 'leaderboard':
+        case 'personal stats':
             if open_form_flag:
-                leaderboard.open()
+                personal_stats.open()
                 open_form_flag = False
-            current_form = leaderboard.update(events_list)
-            if current_form != 'leaderboard':
+            current_form = personal_stats.update(events_list)
+            if current_form != 'personal stats':
                 forms_list.pop()
                 form_pos -= 1
                 open_form_flag = True
-                leaderboard.close()
-                leaderboard.update(events_list)
+                personal_stats.close()
+                personal_stats.update(events_list)
 
     pygame.display.update()
     clock.tick(60)

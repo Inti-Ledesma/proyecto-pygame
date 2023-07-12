@@ -83,10 +83,10 @@ class LevelMenu(Form):
         bg = PictureBox(self._slave, x, y, 1280, 672, "resources/graphics/bg/level menu.png")
         btn_back = Button_Image(self._slave, x, y, 20, 20, 96, 112, "resources/graphics/GUI/button back loose.png", 
                                 self.press_button, ["resources/graphics/GUI/button back pressed.png", 'back'])
-        btn_leaderboard = Button_Image(self._slave, x, y, 1164, 20, 96, 112, "resources/graphics/GUI/button leaderboard loose.png", 
-                                self.press_button, ["resources/graphics/GUI/button leaderboard pressed.png", 'leaderboard'])
-        btn_settings = Button_Image(self._slave, x, y, 1164, 150, 96, 112, "resources/graphics/GUI/button settings 2 loose.png", 
+        btn_settings = Button_Image(self._slave, x, y, 1164, 20, 96, 112, "resources/graphics/GUI/button settings 2 loose.png", 
                                 self.press_button, ["resources/graphics/GUI/button settings 2 pressed.png", 'settings'])
+        btn_personal_stats = Button_Image(self._slave, x, y, 1164, 150, 96, 112, "resources/graphics/GUI/button personal stats loose.png", 
+                                self.press_button, ["resources/graphics/GUI/button personal stats pressed.png", 'personal stats'])
         interface = PictureBox(self._slave, 384, 144, 512, 400, "resources/graphics/GUI/interface level select.png")
         btn_lvl_1 = Button_Image(self._slave, x, y, 424, 320, 96, 112, "resources/graphics/GUI/button level 1 loose.png", 
                                 self.press_button, ["resources/graphics/GUI/button level 1 pressed.png", '1'])
@@ -103,7 +103,7 @@ class LevelMenu(Form):
 
         self.widgets_dict['bg'] = bg
         self.widgets_dict['btn back'] = btn_back
-        self.widgets_dict['btn leaderboard'] = btn_leaderboard
+        self.widgets_dict['btn personal stats'] = btn_personal_stats
         self.widgets_dict['btn settings'] = btn_settings
         self.widgets_dict['interface'] = interface
         self.widgets_dict['btn lvl 1'] = btn_lvl_1
@@ -140,12 +140,16 @@ class LevelMenu(Form):
         btn_pressed = pygame.image.load(path_btn_pressed)
         self.sfx_btn_pressed.play(0)
 
-        if key != 'back' and key != 'leaderboard' and key != 'settings'\
+        if key != 'back' and key != 'personal stats' and key != 'settings'\
             and key != 'level' and key != 'delete data':
             if self.song_name != key and self.level_permissions[key]:
                 self.song.fadeout(200)
                 
-                self.widgets_dict['bg'] = PictureBox(self._slave, 0, 0, 1280, 672, levels[key]['bg'])
+                if key == 'boss':
+                    self.widgets_dict['bg'] = PictureBox(self._slave, 0, 0, 1280, 672, "resources/graphics/bg/boss preview.png")
+                else:
+                    self.widgets_dict['bg'] = PictureBox(self._slave, 0, 0, 1280, 672, levels[key]['bg'])
+
                 self.song_name = key
                 self.song = self.music_dict[self.song_name]
 
@@ -323,7 +327,7 @@ class PauseMenu(Form):
     
 ####################################################################################################################################
 
-class StatsScreen(Form):
+class RankScreen(Form):
     def __init__(self, screen, x, y, w, h, color_background, color_border="Black", border_size=-1, active=True):
         super().__init__(screen, x, y, w, h, color_background, color_border, border_size, active)
 
@@ -346,11 +350,12 @@ class StatsScreen(Form):
             'great':pygame.mixer.Sound("resources/sfx/rank/crowd cheer.mp3"),
             'decent':pygame.mixer.Sound("resources/sfx/rank/decent.mp3"),
             'fail':pygame.mixer.Sound("resources/sfx/rank/fail.mp3"),
-            'btn pressed':pygame.mixer.Sound("resources/sfx/GUI/button pressed.mp3")
+            'btn pressed':pygame.mixer.Sound("resources/sfx/GUI/button pressed.mp3"),
+            'data sfx':pygame.mixer.Sound("resources/sfx/rank/rank sfx.wav")
         }
 
         self.sfx_btn_pressed = self.sfx_dict['btn pressed']
-        self.effect = self.sfx_dict['drumroll']
+        self.sfx = self.sfx_dict['drumroll']
         self.sounds_flag = True
         self.sfx_flag = True
         self.sfx_delay = 0
@@ -366,12 +371,12 @@ class StatsScreen(Form):
         if current_time > self.sfx_delay + 5500:
             if self.level_stats['rank'] == 'F' or\
                 self.level_stats['rank'] == 'D':
-                self.effect = self.sfx_dict['fail']
+                self.sfx = self.sfx_dict['fail']
             elif self.level_stats['rank'] == 'S' or\
                 self.level_stats['rank'] == 'S+':
-                self.effect = self.sfx_dict['great']
+                self.sfx = self.sfx_dict['great']
             else:
-                self.effect = self.sfx_dict['decent']
+                self.sfx = self.sfx_dict['decent']
             self.sounds_flag = True
             self.sfx_flag = False
     
@@ -383,12 +388,18 @@ class StatsScreen(Form):
                         str(self.level_stats['score']),"Arial black", 30, 
                         "black", "resources/graphics/GUI/table 1.png")
                     self.widgets_dict['score'] = label_score
+                    self.sfx = self.sfx_dict['data sfx']
+                    self.sfx.set_volume(volume.sfx_volume)
+                    self.sfx.play(0)
                 case 2:
                     label_hits = Label(self._slave, 530, 370, 96, 64,
                         str(self.level_stats['hits']),"Arial black", 30, 
                         "black", "resources/graphics/GUI/table 1.png")
                     self.widgets_dict['hits'] = label_hits
+                    self.sfx.set_volume(volume.sfx_volume)
+                    self.sfx.play(0)
                 case 3:
+                    self.play_rank_sound_effect(pygame.time.get_ticks())
                     rank_img = PictureBox(self._slave, 630, 212, 256, 256,
                         f"resources/graphics/ranks/{self.level_stats['rank']}.png")
                     self.widgets_dict['rank'] = rank_img
@@ -402,17 +413,15 @@ class StatsScreen(Form):
 
     def update(self, events_list, lvl_stats):
         if self.active:
-            self.form_flag = 'stats screen'
+            self.form_flag = 'rank screen'
             if self.sounds_flag:
                 self.level_stats = lvl_stats
                 self.sfx_btn_pressed.set_volume(volume.sfx_volume)
-                self.effect.set_volume(volume.sfx_volume)
-                self.effect.play(0)
+                self.sfx.set_volume(volume.sfx_volume)
+                self.sfx.play(0)
                 self.sfx_delay = pygame.time.get_ticks()
                 self.stats_delay = 0
                 self.sounds_flag = False
-            elif self.sfx_flag:
-                self.play_rank_sound_effect(pygame.time.get_ticks())
             
             self.display_level_stats(pygame.time.get_ticks())
 
@@ -420,11 +429,11 @@ class StatsScreen(Form):
             for widget in self.widgets_dict:
                 self.widgets_dict[widget].update(events_list)
         else:
-            self.effect.stop()
+            self.sfx.stop()
             self.sounds_flag = True
             self.sfx_flag = True
             self.stats_counter = 0
-            self.effect = self.sfx_dict['drumroll']
+            self.sfx = self.sfx_dict['drumroll']
 
             self.widgets_dict.pop('score')
             self.widgets_dict.pop('hits')
@@ -551,7 +560,7 @@ class DeleteData(Form):
 
 ####################################################################################################################################
 
-class Leaderboard(Form):
+class PersonalStats(Form):
     def __init__(self, screen, x, y, w, h, color_background, color_border="Black", border_size=-1, active=True):
         super().__init__(screen, x, y, w, h, color_background, color_border, border_size, active)
 
@@ -604,7 +613,7 @@ class Leaderboard(Form):
 
     def update(self, events_list):
         if self.active:
-            self.form_flag = 'leaderboard'
+            self.form_flag = 'personal stats'
             if self.sounds_flag:
                 pos = 0
                 scores = get_all_scores()
@@ -628,3 +637,11 @@ class Leaderboard(Form):
                     self.widgets_dict[widget].update(events_list)
         
         return self.form_flag
+
+####################################################################################################################################
+
+class LogIn(Form):
+    def __init__(self, screen, x, y, w, h, color_background, color_border="Black", border_size=-1, active=True):
+        super().__init__(screen, x, y, w, h, color_background, color_border, border_size, active)
+
+        pass
