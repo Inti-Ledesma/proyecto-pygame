@@ -1,6 +1,7 @@
 import pygame
 from configurations import levels, volume, delete_data_json,\
-    delete_data_db, get_all_scores, get_level_permissions
+    delete_data_db, get_all_scores, get_level_permissions,\
+    obtain_top_5_players_data
 from GUI_button_image import *
 from GUI_button import *
 from GUI_checkbox import *
@@ -87,6 +88,8 @@ class LevelMenu(Form):
                                 self.press_button, ["resources/graphics/GUI/button settings 2 pressed.png", 'settings'])
         btn_personal_stats = Button_Image(self._slave, x, y, 1164, 150, 96, 112, "resources/graphics/GUI/button personal stats loose.png", 
                                 self.press_button, ["resources/graphics/GUI/button personal stats pressed.png", 'personal stats'])
+        btn_leaderboard = Button_Image(self._slave, x, y, 1164, 280, 96, 112, "resources/graphics/GUI/button leaderboard loose.png", 
+                                self.press_button, ["resources/graphics/GUI/button leaderboard pressed.png", 'leaderboard'])
         interface = PictureBox(self._slave, 384, 144, 512, 400, "resources/graphics/GUI/interface level select.png")
         btn_lvl_1 = Button_Image(self._slave, x, y, 424, 320, 96, 112, "resources/graphics/GUI/button level 1 loose.png", 
                                 self.press_button, ["resources/graphics/GUI/button level 1 pressed.png", '1'])
@@ -104,6 +107,7 @@ class LevelMenu(Form):
         self.widgets_dict['bg'] = bg
         self.widgets_dict['btn back'] = btn_back
         self.widgets_dict['btn personal stats'] = btn_personal_stats
+        self.widgets_dict['btn leaderboard'] = btn_leaderboard
         self.widgets_dict['btn settings'] = btn_settings
         self.widgets_dict['interface'] = interface
         self.widgets_dict['btn lvl 1'] = btn_lvl_1
@@ -141,7 +145,7 @@ class LevelMenu(Form):
         self.sfx_btn_pressed.play(0)
 
         if key != 'back' and key != 'personal stats' and key != 'settings'\
-            and key != 'level' and key != 'delete data':
+            and key != 'level' and key != 'delete data' and key != 'leaderboard':
             if self.song_name != key and self.level_permissions[key]:
                 self.song.fadeout(200)
                 
@@ -569,7 +573,7 @@ class PersonalStats(Form):
         bg = PictureBox(self._slave, x, y, 1280, 672, "resources/graphics/bg/main menu.png")
         btn_back = Button_Image(self._slave, x, y, 20, 20, 96, 112, "resources/graphics/GUI/button back loose.png", 
                                 self.press_button, ["resources/graphics/GUI/button back pressed.png", 'back'])
-        interface = PictureBox(self._slave, 384, 61, 512, 550, "resources/graphics/GUI/interface leaderboard.png")
+        interface = PictureBox(self._slave, 384, 60, 512, 550, "resources/graphics/GUI/interface scores.png")
         lvl_1_score = Label(self._slave, 700, 200, 120, 64,'',"Arial black",
                             30,"black", "resources/graphics/GUI/table 1.png")
         lvl_2_score = Label(self._slave, 700, 270, 120, 64,'',"Arial black",
@@ -640,8 +644,139 @@ class PersonalStats(Form):
 
 ####################################################################################################################################
 
-class LogIn(Form):
+class Leaderboard(Form):
     def __init__(self, screen, x, y, w, h, color_background, color_border="Black", border_size=-1, active=True):
         super().__init__(screen, x, y, w, h, color_background, color_border, border_size, active)
 
-        pass
+        self.form_flag = ''
+
+        bg = PictureBox(self._slave, x, y, 1280, 672, "resources/graphics/bg/main menu.png")
+        btn_back = Button_Image(self._slave, x, y, 20, 20, 96, 112, "resources/graphics/GUI/button back loose.png", 
+                                self.press_button, ["resources/graphics/GUI/button back pressed.png", 'back'])
+        interface = PictureBox(self._slave, 384, 60, 512, 550, "resources/graphics/GUI/interface leaderboard.png")
+        top_1 = Label(self._slave, 472, 188, 380, 64,'',"Arial black",
+                        30,"black", "resources/graphics/GUI/table 2.png")
+        top_2 = Label(self._slave, 472, 260, 380, 64,'',"Arial black",
+                        30,"black", "resources/graphics/GUI/table 2.png")
+        top_3 = Label(self._slave, 472, 332, 380, 64,'',"Arial black",
+                        30,"black", "resources/graphics/GUI/table 2.png")
+        top_4 = Label(self._slave, 472, 404, 380, 64,'',"Arial black",
+                        30,"black", "resources/graphics/GUI/table 2.png")
+        top_5 = Label(self._slave, 472, 476, 380, 64,'',"Arial black",
+                        30,"black", "resources/graphics/GUI/table 2.png")
+        
+        self.widgets_dict['bg'] = bg
+        self.widgets_dict['btn back'] = btn_back
+        self.widgets_dict['interface'] = interface
+        self.widgets_dict['top 1'] = top_1
+        self.widgets_dict['top 2'] = top_2
+        self.widgets_dict['top 3'] = top_3
+        self.widgets_dict['top 4'] = top_4
+        self.widgets_dict['top 5'] = top_5
+
+        self.leaderboard = {
+            '1':0,
+            '2':0,
+            '3':0,
+            '4':0,
+            '5':0,
+        }
+
+        # SFX
+        self.sfx_btn_pressed = pygame.mixer.Sound("resources/sfx/GUI/button pressed.mp3")
+
+        self.sounds_flag = True
+    
+    def press_button(self, path_btn_pressed, key):
+        btn_pressed = pygame.image.load(path_btn_pressed)
+        self.sfx_btn_pressed.play(0)
+        
+        self.form_flag = key
+
+        return btn_pressed
+
+    def update(self, events_list):
+        if self.active:
+            self.form_flag = 'leaderboard'
+            if self.sounds_flag:
+                pos = 0
+                leaderboard = obtain_top_5_players_data()
+
+                for key in self.leaderboard:
+                    for widget in self.widgets_dict:
+                        if widget.rfind(key) != -1:
+                            pos += 1
+                            data = f"{leaderboard[str(pos)]['username']}   {leaderboard[str(pos)]['total']}"
+                            self.widgets_dict[widget].set_text(data)
+                            
+                self.sfx_btn_pressed.set_volume(volume.sfx_volume)
+                self.sounds_flag = False
+            self.draw()
+            for widget in self.widgets_dict:
+                self.widgets_dict[widget].update(events_list)
+        else:
+            self.sounds_flag = True
+
+            for widget in self.widgets_dict:
+                if widget.rfind('btn') != -1 and self.widgets_dict[widget].isclicked:
+                    self.widgets_dict[widget]._slave = self.widgets_dict[widget].image
+                else:
+                    self.widgets_dict[widget].update(events_list)
+        
+        return self.form_flag
+
+####################################################################################################################################
+
+class SetUsername(Form):
+    def __init__(self, screen, x, y, w, h, color_background, color_border="Black", border_size=-1, active=True):
+        super().__init__(screen, x, y, w, h, color_background, color_border, border_size, active)
+
+        self.form_flag = ''
+
+        bg = PictureBox(self._slave, x, y, 1280, 672, "resources/graphics/bg/main menu.png")
+        btn_back = Button_Image(self._slave, x, y, 20, 20, 96, 112, "resources/graphics/GUI/button back loose.png", 
+                                self.press_button, ["resources/graphics/GUI/button back pressed.png", 'back'])
+        interface = PictureBox(self._slave, 384, 144, 512, 400, "resources/graphics/GUI/interface settings.png")
+
+        self.widgets_dict['bg'] = bg
+        self.widgets_dict['btn back'] = btn_back
+        self.widgets_dict['interface'] = interface
+
+        # Music
+        self.song = pygame.mixer.Sound("resources/music/settings and htp.mp3")
+
+        # SFX
+        self.sfx_btn_pressed = pygame.mixer.Sound("resources/sfx/GUI/button pressed.mp3")
+
+        self.sounds_flag = True
+    
+    def press_button(self, path_btn_pressed, key):
+        btn_pressed = pygame.image.load(path_btn_pressed)
+        self.sfx_btn_pressed.play(0)
+        self.form_flag = key
+
+        return btn_pressed
+
+    def update(self, events_list):
+        if self.active:
+            self.form_flag = 'set username'
+            if self.sounds_flag:
+                self.song.set_volume(volume.music_volume)
+                self.sfx_btn_pressed.set_volume(volume.sfx_volume)
+                self.song.play(-1,0,200)
+                self.sounds_flag = False
+            
+            self.draw()
+            for widget in self.widgets_dict:
+                self.widgets_dict[widget].update(events_list)
+        else:
+            self.song.stop()
+            self.sounds_flag = True
+
+            for widget in self.widgets_dict:
+                if widget.rfind('btn') != -1 and self.widgets_dict[widget].isclicked:
+                    self.widgets_dict[widget]._slave = self.widgets_dict[widget].image
+                else:
+                    self.widgets_dict[widget].update(events_list)
+            
+        return self.form_flag

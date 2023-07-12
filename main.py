@@ -12,7 +12,7 @@ clock = pygame.time.Clock()
 from configurations import levels, create_stats_json, create_scores_db
 from level import Level
 from forms import MainMenu, LevelMenu, PauseMenu, Settings,\
-    RankScreen, HowToPlayMenu, DeleteData, PersonalStats
+    RankScreen, HowToPlayMenu, DeleteData, PersonalStats, Leaderboard
 
 create_stats_json()
 create_scores_db()
@@ -25,6 +25,7 @@ rank_screen = RankScreen(screen,0,0,screen_w,screen_h,"black","black",1,False)
 htp_menu = HowToPlayMenu(screen,0,0,screen_w,screen_h,"black","black",1,False)
 delete_data = DeleteData(screen,0,0,screen_w,screen_h,"black","black",1,False)
 personal_stats = PersonalStats(screen,0,0,screen_w,screen_h,"black","black",1,False)
+leaderboard = Leaderboard(screen,0,0,screen_w,screen_h,"black","black",1,False)
 
 lvl_form = ''
 lvl_selected = ''
@@ -158,6 +159,17 @@ while 1:
                 open_form_flag = True
                 personal_stats.close()
                 personal_stats.update(events_list)
+        case 'leaderboard':
+            if open_form_flag:
+                leaderboard.open()
+                open_form_flag = False
+            current_form = leaderboard.update(events_list)
+            if current_form != 'leaderboard':
+                forms_list.pop()
+                form_pos -= 1
+                open_form_flag = True
+                leaderboard.close()
+                leaderboard.update(events_list)
 
     pygame.display.update()
     clock.tick(60)
