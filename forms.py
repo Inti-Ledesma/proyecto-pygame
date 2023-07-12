@@ -1,7 +1,7 @@
 import pygame
 from configurations import levels, volume, delete_data_json,\
     delete_data_db, get_all_scores, get_level_permissions,\
-    obtain_top_5_players_data
+    obtain_top_5_players_data, save_username
 from GUI_button_image import *
 from GUI_button import *
 from GUI_checkbox import *
@@ -25,8 +25,10 @@ class MainMenu(Form):
         x_img = PictureBox(self._slave, 950, 310, 224, 362, "resources/graphics/main menu/x image.png")
         btn_play = Button_Image(self._slave, x, y, 512, 450, 256, 112, "resources/graphics/GUI/button play 1 loose.png", 
                             self.press_button, ["resources/graphics/GUI/button play 1 pressed.png", 'level menu'])
-        btn_htp = Button_Image(self._slave, x, y, 1164, 20, 96, 112, "resources/graphics/GUI/button HTP loose.png", 
+        btn_htp = Button_Image(self._slave, x, y, 20, 20, 96, 112, "resources/graphics/GUI/button HTP loose.png", 
                             self.press_button, ["resources/graphics/GUI/button HTP pressed.png", 'htp'])
+        btn_login = Button_Image(self._slave, x, y, 1164, 20, 96, 112, "resources/graphics/GUI/button login loose.png", 
+                            self.press_button, ["resources/graphics/GUI/button login pressed.png", 'login'])
 
         self.widgets_dict['bg'] = bg
         self.widgets_dict['title'] = title
@@ -34,6 +36,7 @@ class MainMenu(Form):
         self.widgets_dict['x_img'] = x_img
         self.widgets_dict['btn play'] = btn_play
         self.widgets_dict['btn htp'] = btn_htp
+        self.widgets_dict['btn login'] = btn_login
 
         # Music
         self.song = pygame.mixer.Sound("resources/music/presentation2.mp3")
@@ -727,7 +730,7 @@ class Leaderboard(Form):
 
 ####################################################################################################################################
 
-class SetUsername(Form):
+class Login(Form):
     def __init__(self, screen, x, y, w, h, color_background, color_border="Black", border_size=-1, active=True):
         super().__init__(screen, x, y, w, h, color_background, color_border, border_size, active)
 
@@ -736,14 +739,16 @@ class SetUsername(Form):
         bg = PictureBox(self._slave, x, y, 1280, 672, "resources/graphics/bg/main menu.png")
         btn_back = Button_Image(self._slave, x, y, 20, 20, 96, 112, "resources/graphics/GUI/button back loose.png", 
                                 self.press_button, ["resources/graphics/GUI/button back pressed.png", 'back'])
-        interface = PictureBox(self._slave, 384, 144, 512, 400, "resources/graphics/GUI/interface settings.png")
+        interface = PictureBox(self._slave, 384, 144, 512, 400, "resources/graphics/GUI/interface login.png")
+        text_box = TextBox(self._slave, x, y, 540, 420, 200, 30, "cyan", "white", "blue", "blue", 2, "Arial Black", 20, "black", 10)
+        btn_confirm = Button_Image(self._slave, x, y, 770, 380, 96, 112, "resources/graphics/GUI/button confirm loose.png", 
+                                self.press_button, ["resources/graphics/GUI/button confirm pressed.png", 'confirm'])
 
         self.widgets_dict['bg'] = bg
         self.widgets_dict['btn back'] = btn_back
         self.widgets_dict['interface'] = interface
-
-        # Music
-        self.song = pygame.mixer.Sound("resources/music/settings and htp.mp3")
+        self.widgets_dict['text box'] = text_box
+        self.widgets_dict['btn confirm'] = btn_confirm
 
         # SFX
         self.sfx_btn_pressed = pygame.mixer.Sound("resources/sfx/GUI/button pressed.mp3")
@@ -751,6 +756,8 @@ class SetUsername(Form):
         self.sounds_flag = True
     
     def press_button(self, path_btn_pressed, key):
+        if key == 'confirm':
+            save_username(self.widgets_dict['text box']._text)
         btn_pressed = pygame.image.load(path_btn_pressed)
         self.sfx_btn_pressed.play(0)
         self.form_flag = key
@@ -759,18 +766,17 @@ class SetUsername(Form):
 
     def update(self, events_list):
         if self.active:
-            self.form_flag = 'set username'
+            self.form_flag = 'login'
             if self.sounds_flag:
-                self.song.set_volume(volume.music_volume)
+                self.widgets_dict['text box'].set_text("")
+                self.widgets_dict['text box'].update(events_list)
                 self.sfx_btn_pressed.set_volume(volume.sfx_volume)
-                self.song.play(-1,0,200)
                 self.sounds_flag = False
             
             self.draw()
             for widget in self.widgets_dict:
                 self.widgets_dict[widget].update(events_list)
         else:
-            self.song.stop()
             self.sounds_flag = True
 
             for widget in self.widgets_dict:

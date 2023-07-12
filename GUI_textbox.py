@@ -12,7 +12,7 @@ class TextBox(Widget):
     def __init__(
             self, screen,master_x,master_y, x,y,w,h,
             color_background,color_background_seleccionado,color_border, color_border_seleccionado, border_size ,font, font_size,
-            font_color):
+            font_color, char_limit):
         super().__init__(screen, x,y,w,h,color_background,color_border, border_size)
         
         pygame.font.init()#llamo al constructor de la fuente porque sino a veces pincha
@@ -21,6 +21,7 @@ class TextBox(Widget):
         self._color_background_seleccionado = color_background_seleccionado
         self._color_border_seleccionado = color_border_seleccionado
         self._text = ""
+        self._char_limit = char_limit
         self._font = pygame.font.SysFont(font,font_size)
         self._font_color = font_color
         self._master_x = master_x
@@ -80,7 +81,8 @@ class TextBox(Widget):
                 caracter = evento.unicode
                 if evento.key == pygame.K_BACKSPACE:
                    self._text = self._text[:-1]
-                elif len(caracter) == 1 and unicodedata.category(caracter)[0] != 'C':
+                elif len(caracter) == 1 and unicodedata.category(caracter)[0] != 'C'\
+                    and len(self._text) < self._char_limit:
                     self._text += caracter
                 self.render()
         self.draw()
