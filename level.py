@@ -32,6 +32,9 @@ class Level:
         self.names_initial_dict = names_initial
         self.lives_dict = lives
 
+        # SFX
+        self.change_sfx = pygame.mixer.Sound("resources/sfx/change.wav")
+
         # Music
         self.music_flag = True
         pygame.mixer.music.load(level_data['song'])
@@ -257,6 +260,9 @@ class Level:
                     self.character.add(CharacterX((x,y), self.player.facing_right))
                     self.character_name = 'x'
                     self.character_change_delay = pygame.time.get_ticks()
+            if not block:
+                self.change_sfx.set_volume(volume.sfx_volume)
+                self.change_sfx.play(0)
 
     def run(self, current_time, events_list):
         if self.form_flag != 'rank screen':
