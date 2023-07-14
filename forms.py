@@ -39,7 +39,7 @@ class MainMenu(Form):
         self.widgets_dict['btn login'] = btn_login
 
         # Music
-        self.song = pygame.mixer.Sound("resources/music/presentation2.mp3")
+        self.song = pygame.mixer.Sound("resources/music/presentation.mp3")
 
         # SFX
         self.sfx_btn_pressed = pygame.mixer.Sound("resources/sfx/GUI/button pressed.mp3")

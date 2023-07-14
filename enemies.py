@@ -2,6 +2,9 @@ import pygame
 from configurations import import_folder, volume
 from bullets import GunVoltBullet, RoboBigFuzzBullet
 
+sfx_explosion = pygame.mixer.Sound("resources/sfx/explosion.mp3")
+sfx_hit = pygame.mixer.Sound("resources/sfx/enemy hit.wav")
+
 class BallDeVoux(pygame.sprite.Sprite):
     def __init__(self, pos):
         super().__init__()
@@ -24,12 +27,8 @@ class BallDeVoux(pygame.sprite.Sprite):
         self.status = 'walk'
         self.facing_left = True
         self.health = 6
-        self.got_hit = False
         self.dead = False
         self.score_value = 500
-
-        # SFX
-        self.sfx_explosion = pygame.mixer.Sound("resources/sfx/explosion.mp3")
     
     def import_assets(self):
         character_path = "resources/graphics/enemies/balldevoux/"
@@ -99,13 +98,14 @@ class BallDeVoux(pygame.sprite.Sprite):
         # Bullets collision
         if len(bullets):
             for bullet in bullets.sprites():
-                if self.hitbox.colliderect(bullet): 
-                    self.got_hit = True
+                if self.hitbox.colliderect(bullet):
+                    sfx_explosion.set_volume(volume.sfx_volume)
+                    sfx_hit.play(0)
                     self.health -= player.damage
                     if self.health <= 0:
                         self.dead = True
-                        self.sfx_explosion.set_volume(volume.sfx_volume)
-                        self.sfx_explosion.play(0)
+                        sfx_explosion.set_volume(volume.sfx_volume)
+                        sfx_explosion.play(0)
                         player_stats.score += self.score_value
                     bullet.kill()
 
@@ -148,12 +148,8 @@ class Spiky(pygame.sprite.Sprite):
         self.status = 'spin'
         self.facing_left = True
         self.health = 5
-        self.got_hit = False
         self.dead = False
         self.score_value = score
-
-        # SFX
-        self.sfx_explosion = pygame.mixer.Sound("resources/sfx/explosion.mp3")
     
     def import_assets(self):
         character_path = "resources/graphics/enemies/spiky/"
@@ -242,13 +238,14 @@ class Spiky(pygame.sprite.Sprite):
         # Bullet collision
         if len(bullets):
             for bullet in bullets.sprites():
-                if self.hitbox.colliderect(bullet): 
-                    self.got_hit = True
+                if self.hitbox.colliderect(bullet):
+                    sfx_explosion.set_volume(volume.sfx_volume)
+                    sfx_hit.play(0)
                     self.health -= player.damage
                     if self.health <= 0:
                         self.dead = True
-                        self.sfx_explosion.set_volume(volume.sfx_volume)
-                        self.sfx_explosion.play(0)
+                        sfx_explosion.set_volume(volume.sfx_volume)
+                        sfx_explosion.play(0)
                         player_stats.score += self.score_value
                     bullet.kill()
 
@@ -290,9 +287,6 @@ class GunVolt(pygame.sprite.Sprite):
 
         # Bullet
         self.bullets = pygame.sprite.Group()
-
-        # SFX
-        self.sfx_explosion = pygame.mixer.Sound("resources/sfx/explosion.mp3")
     
     def import_assets(self):
         character_path = "resources/graphics/enemies/gunvolt/"
@@ -363,12 +357,14 @@ class GunVolt(pygame.sprite.Sprite):
         # Bullets collision
         if len(bullets) and self.attack:
             for bullet in bullets.sprites():
-                if self.hitbox.colliderect(bullet): 
+                if self.hitbox.colliderect(bullet):
+                    sfx_explosion.set_volume(volume.sfx_volume)
+                    sfx_hit.play(0)
                     self.health -= player.damage
                     if self.health <= 0:
                         self.dead = True
-                        self.sfx_explosion.set_volume(volume.sfx_volume)
-                        self.sfx_explosion.play(0)
+                        sfx_explosion.set_volume(volume.sfx_volume)
+                        sfx_explosion.play(0)
                         player_stats.score += self.score_value
                     bullet.kill()
 
@@ -420,9 +416,6 @@ class RoboBigFuzz(pygame.sprite.Sprite):
         self.y_neg_limit = False
         self.x_limit = False
         self.bullet_flag = True
-
-        # SFX
-        self.sfx_explosion = pygame.mixer.Sound("resources/sfx/explosion.mp3")
     
     def import_assets(self):
         character_path = "resources/graphics/enemies/boss/"
@@ -509,12 +502,14 @@ class RoboBigFuzz(pygame.sprite.Sprite):
         # Bullets collision
         if len(bullets):
             for bullet in bullets.sprites():
-                if self.hitbox.colliderect(bullet): 
+                if self.hitbox.colliderect(bullet):
+                    sfx_explosion.set_volume(volume.sfx_volume)
+                    sfx_hit.play(0)
                     self.health -= player.damage
                     if self.health <= 0:
                         self.dead = True
-                        self.sfx_explosion.set_volume(volume.sfx_volume)
-                        self.sfx_explosion.play(0)
+                        sfx_explosion.set_volume(volume.sfx_volume)
+                        sfx_explosion.play(0)
                         player_stats.score += self.score_value
                     bullet.kill()
     
