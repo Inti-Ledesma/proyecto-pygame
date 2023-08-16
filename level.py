@@ -212,8 +212,8 @@ class Level:
         for live in range(self.player.health):
             screen.blit(self.lives_dict[str(live+1)]['img'], self.lives_dict[str(live+1)]['pos'])
 
-    def update_timer(self, current_time):
-        if current_time - self.level_delay > 1000:
+    def update_timer(self):
+        if pygame.time.get_ticks() - self.level_delay > 1000:
             self.level_timer -= 1
             self.level_delay = pygame.time.get_ticks()
 
@@ -395,7 +395,7 @@ class Level:
 
             # Timer
             if self.level_timer > 0:
-                self.update_timer(current_time)
+                self.update_timer()
         else:
             if self.player.end_level and self.level_timer > 0:
                 self.level_timer -= 0.5

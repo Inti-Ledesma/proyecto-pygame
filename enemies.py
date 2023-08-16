@@ -5,6 +5,7 @@ from bullets import GunVoltBullet, RoboBigFuzzBullet
 sfx_explosion = pygame.mixer.Sound("resources/sfx/explosion.mp3")
 sfx_hit = pygame.mixer.Sound("resources/sfx/enemy hit.wav")
 
+
 class BallDeVoux(pygame.sprite.Sprite):
     def __init__(self, pos):
         super().__init__()
@@ -99,7 +100,7 @@ class BallDeVoux(pygame.sprite.Sprite):
         if len(bullets):
             for bullet in bullets.sprites():
                 if self.hitbox.colliderect(bullet):
-                    sfx_explosion.set_volume(volume.sfx_volume)
+                    sfx_hit.set_volume(volume.sfx_volume)
                     sfx_hit.play(0)
                     self.health -= player.damage
                     if self.health <= 0:
@@ -239,7 +240,7 @@ class Spiky(pygame.sprite.Sprite):
         if len(bullets):
             for bullet in bullets.sprites():
                 if self.hitbox.colliderect(bullet):
-                    sfx_explosion.set_volume(volume.sfx_volume)
+                    sfx_hit.set_volume(volume.sfx_volume)
                     sfx_hit.play(0)
                     self.health -= player.damage
                     if self.health <= 0:
@@ -358,7 +359,7 @@ class GunVolt(pygame.sprite.Sprite):
         if len(bullets) and self.attack:
             for bullet in bullets.sprites():
                 if self.hitbox.colliderect(bullet):
-                    sfx_explosion.set_volume(volume.sfx_volume)
+                    sfx_hit.set_volume(volume.sfx_volume)
                     sfx_hit.play(0)
                     self.health -= player.damage
                     if self.health <= 0:
@@ -503,7 +504,7 @@ class RoboBigFuzz(pygame.sprite.Sprite):
         if len(bullets):
             for bullet in bullets.sprites():
                 if self.hitbox.colliderect(bullet):
-                    sfx_explosion.set_volume(volume.sfx_volume)
+                    sfx_hit.set_volume(volume.sfx_volume)
                     sfx_hit.play(0)
                     self.health -= player.damage
                     if self.health <= 0:

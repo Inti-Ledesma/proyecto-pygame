@@ -29,6 +29,8 @@ class Coin(pygame.sprite.Sprite):
     def update(self, player:pygame.sprite.GroupSingle, player_stats):
         self.collisions(player.sprite, player_stats)
         self.animate()
+        if self.sfx.get_volume() != volume.sfx_volume:
+            self.sfx.set_volume(volume.sfx_volume)
 
 class Door(pygame.sprite.Sprite):
     def __init__(self, pos):
@@ -72,6 +74,8 @@ class Door(pygame.sprite.Sprite):
     def update(self, player_stats):
         self.check_key_grabbed(player_stats)
         self.animate()
+        if self.sfx.get_volume() != volume.sfx_volume:
+            self.sfx.set_volume(volume.sfx_volume)
 
 class Key(pygame.sprite.Sprite):
     def __init__(self, pos):
@@ -241,6 +245,8 @@ class Health(pygame.sprite.Sprite):
     def update(self, player:pygame.sprite.GroupSingle, player_stats):
         self.animation()
         self.check_collissions(player.sprite, player_stats)
+        if self.sfx.get_volume() != volume.sfx_volume:
+            self.sfx.set_volume(volume.sfx_volume)
 
 class Spike(pygame.sprite.Sprite):
     def __init__(self, pos):
